@@ -765,6 +765,7 @@ const baseThreadQuery = ({
   }
   return query
     .andWhere(`${Table.EMAIL}.date`, '<', date || 'now')
+    .andWhere(`${Table.EMAIL}.accountId`, myAccount.id)
     .groupBy('uniqueId')
     .orderBy(`${Table.EMAIL}.date`, 'DESC')
     .limit(limit || 20);
