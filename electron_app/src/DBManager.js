@@ -624,7 +624,8 @@ const getEmailsGroupByThreadByParams = (params = {}) => {
     contactFilter,
     rejectedLabelIds,
     threadIdRejected,
-    unread
+    unread,
+    accountId = myAccount.id
   } = params;
 
   let queryDb = baseThreadQuery({
@@ -634,7 +635,8 @@ const getEmailsGroupByThreadByParams = (params = {}) => {
     contactTypes,
     contactFilter,
     rejectedLabelIds,
-    threadIdRejected
+    threadIdRejected,
+    accountId
   });
 
   if (plain) {
@@ -722,7 +724,8 @@ const baseThreadQuery = ({
   contactTypes,
   contactFilter,
   rejectedLabelIds,
-  threadIdRejected
+  threadIdRejected,
+  accountId
 }) => {
   const {
     labelsQuery,
@@ -782,7 +785,7 @@ const baseThreadQuery = ({
   }
   return query
     .andWhere(`${Table.EMAIL}.date`, '<', date || 'now')
-    .andWhere(`${Table.EMAIL}.accountId`, myAccount.id)
+    .andWhere(`${Table.EMAIL}.accountId`, accountId)
     .groupBy('uniqueId')
     .orderBy(`${Table.EMAIL}.date`, 'DESC')
     .limit(limit || 20);
