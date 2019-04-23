@@ -42,7 +42,7 @@ const defineActiveAccountById = async (accountId, prevTrx) => {
       .table(Table.ACCOUNT)
       .select('*')
       .where({ isActive: true });
-    myAccount.update(activeAccount);
+    myAccount.initialize(activeAccount);
   });
 };
 
@@ -123,8 +123,9 @@ const deleteAccountContact = ({ accountId }, trx) => {
 const createContact = params => {
   return db.transaction(async trx => {
     const { accountId } = params;
-    delete params.accountId;
-    const [contactId] = await trx.table(Table.CONTACT).insert(params);
+    const contactData = Object.assign({}, params);
+    delete contactData.accountId;
+    const [contactId] = await trx.table(Table.CONTACT).insert(contactData);
     await createAccountContact({ contactId, accountId }, trx);
     return contactId;
   });
@@ -597,7 +598,7 @@ const getEmailsByThreadId = threadId => {
       `${Table.EMAIL_LABEL}.emailId`,
       `${Table.EMAIL}.id`
     )
-    .where({ threadId })
+    .where({ threadId, accountId: myAccount.id })
     .groupBy(`${Table.EMAIL}.id`);
 };
 
