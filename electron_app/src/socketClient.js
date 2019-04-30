@@ -20,8 +20,8 @@ const setMessageListener = mListener => (messageListener = mListener);
 
 const disconnect = () => {
   if (socketConnection) {
-    socketConnection.close();
     pingProcess.kill();
+    socketConnection.close();
   }
 };
 
