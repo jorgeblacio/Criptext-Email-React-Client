@@ -187,6 +187,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
             ownProps.onClickSelectedItem(type, params);
           } else {
             openFilledComposerWindow({
+              accountId: myAccount.id,
               key: thread.key,
               type: composerEvents.EDIT_DRAFT
             });
@@ -203,6 +204,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
             });
           } else if (allLabels.includes(draftLabelId)) {
             openFilledComposerWindow({
+              accountId: myAccount.id,
               key: thread.key,
               type: composerEvents.EDIT_DRAFT
             });
