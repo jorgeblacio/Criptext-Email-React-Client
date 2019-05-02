@@ -661,7 +661,7 @@ const getEmailsByThreadId = ({ threadId, accountId }) => {
     .groupBy(`${Table.EMAIL}.id`);
 };
 
-const getEmailsCounterByLabelId = labelId => {
+const getEmailsCounterByLabelId = ({ labelId, accountId }) => {
   return db(`${Table.EMAIL}`)
     .countDistinct(`${Table.EMAIL}.id as count`)
     .leftJoin(
@@ -669,7 +669,8 @@ const getEmailsCounterByLabelId = labelId => {
       `${Table.EMAIL}.id`,
       `${Table.EMAIL_LABEL}.emailId`
     )
-    .where(`${Table.EMAIL_LABEL}.labelId`, labelId);
+    .where(`${Table.EMAIL_LABEL}.labelId`, labelId)
+    .andWhere(`${Table.EMAIL}.accountId`, accountId);
 };
 
 const getEmailsGroupByThreadByParams = (params = {}) => {
