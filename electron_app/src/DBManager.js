@@ -849,7 +849,7 @@ const baseThreadQuery = ({
     .andWhere(`${Table.EMAIL}.accountId`, accountId)
     .groupBy('uniqueId')
     .orderBy(`${Table.EMAIL}.date`, 'DESC')
-    .limit(limit || 20);
+    .limit(limit || 22);
 };
 
 const getQueryParamsIfOrNotRejectedLabel = ({ labelId, rejectedLabelIds }) => {
