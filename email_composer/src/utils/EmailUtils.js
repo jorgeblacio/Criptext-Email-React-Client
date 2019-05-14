@@ -4,11 +4,7 @@ import {
   getFilesByEmailId,
   getEmailByKeyWithbody
 } from './ipc';
-import {
-  cleanHTML,
-  removeActionsFromSubject,
-  removeAppDomain
-} from './StringUtils';
+import { cleanHTML, removeActionsFromSubject } from './StringUtils';
 import { getFormattedDate } from './DateUtils';
 import {
   appDomain,
@@ -22,21 +18,23 @@ import { HTMLTagsRegex } from './RegexUtils';
 
 const myEmailAddress = `${myAccount.recipientId}@${appDomain}`;
 
-const filterNonCriptextRecipients = recipients => {
-  return recipients.filter(email => email.indexOf(`@${appDomain}`) < 0);
-};
-
 const formAppSign = () => {
   return '<br/><span style="font-size: 12px;">Sent with <a style="color: #0091ff; text-decoration: none;" href="https://goo.gl/qW4Aks">Criptext</a> secure email</span>';
 };
 
-const getCriptextRecipients = (recipients, type) => {
-  return recipients
-    .filter(email => email.indexOf(`@${appDomain}`) > 0)
-    .map(email => ({
-      recipientId: removeAppDomain(email),
+const getRecipientsWithDomain = (recipients, type) => {
+  return recipients.map(email => {
+    const recipientDomain = email.split('@');
+    const username = recipientDomain[0];
+    const domain = recipientDomain[1];
+
+    return {
+      username,
+      domain,
+      recipientId: domain === appDomain ? username : email,
       type
-    }));
+    };
+  });
 };
 
 const getEmailAddressesFromEmailObject = emails => {
@@ -107,16 +105,11 @@ export const formOutgoingEmailFromData = ({
   const cc = getEmailAddressesFromEmailObject(ccEmails);
   const bcc = getEmailAddressesFromEmailObject(bccEmails);
 
-  const criptextRecipients = [
-    ...getCriptextRecipients(to, 'to'),
-    ...getCriptextRecipients(cc, 'cc'),
-    ...getCriptextRecipients(bcc, 'bcc')
+  const recipientDomains = [
+    ...getRecipientsWithDomain(to, 'to'),
+    ...getRecipientsWithDomain(cc, 'cc'),
+    ...getRecipientsWithDomain(bcc, 'bcc')
   ];
-  const externalRecipients = {
-    to: filterNonCriptextRecipients(to),
-    cc: filterNonCriptextRecipients(cc),
-    bcc: filterNonCriptextRecipients(bcc)
-  };
 
   const accountId = account.id;
   const nameAddress = myAccount.id === account.id ? `${myAccount.name} ` : '';
@@ -161,8 +154,7 @@ export const formOutgoingEmailFromData = ({
 
   return {
     emailData,
-    criptextRecipients,
-    externalRecipients
+    recipientDomains
   };
 };
 
