@@ -357,6 +357,18 @@ export const handleEvent = incomingEvent => {
   }
 };
 
+const buildSenderRecipientId = ({ senderId, senderDomain, from, external }) => {
+  if (senderDomain && senderId) {
+    return senderDomain === appDomain
+      ? senderId
+      : `${senderId}@${senderDomain}`;
+  }
+
+  return external === true
+    ? EXTERNAL_RECIPIENT_ID_SERVER
+    : getRecipientIdFromEmailAddressTag(from);
+};
+
 const handleNewMessageEvent = async ({
   rowid,
   params,
@@ -378,6 +390,8 @@ const handleNewMessageEvent = async ({
     labels,
     messageType,
     metadataKey,
+    senderDomain,
+    senderId,
     subject,
     senderDeviceId,
     threadId,
@@ -388,10 +402,12 @@ const handleNewMessageEvent = async ({
     boundary
   } = params;
   if (!metadataKey) return { rowid: null };
-  const recipientId =
-    external === true
-      ? EXTERNAL_RECIPIENT_ID_SERVER
-      : getRecipientIdFromEmailAddressTag(from);
+  const recipientId = buildSenderRecipientId({
+    senderId,
+    senderDomain,
+    from,
+    external
+  });
   const deviceId =
     external === undefined
       ? typeof messageType === 'number'
@@ -406,7 +422,9 @@ const handleNewMessageEvent = async ({
   const SentLabelId = LabelType.sent.id;
   const SpamLabelId = LabelType.spam.id;
   const isFromMe =
-    myAccount.recipientId === getRecipientIdFromEmailAddressTag(from);
+    (myAccount.domain === appDomain
+      ? myAccount.recipientId
+      : `${myAccount.recipientId}:${myAccount.domain}`) === recipientId;
   const recipients = getRecipientsFromData({
     to: to || toArray,
     cc: cc || ccArray,
