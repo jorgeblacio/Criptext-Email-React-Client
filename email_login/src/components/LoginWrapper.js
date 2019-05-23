@@ -203,19 +203,6 @@ class LoginWrapper extends Component {
     }
   };
 
-  toggleSignUp = async ev => {
-    ev.preventDefault();
-    ev.stopPropagation();
-    if (this.state.mode === mode.LOGIN) {
-      const check = await this.checkLoggedOutAccounts();
-      if (check === true) {
-        this.setState(state => ({
-          mode: state.mode === mode.LOGIN ? mode.SIGNUP : mode.LOGIN
-        }));
-      }
-    }
-  };
-
   handleToggleSignUp = async e => {
     e.preventDefault();
     e.stopPropagation();
