@@ -562,10 +562,11 @@ class ComposerWrapper extends Component {
       }
 
       [emailId] = await createEmail(emailData);
+      const [username, domain] = account.recipientId.split('@');
       const peer = {
         recipientId: account.recipientId,
-        username: account.recipientId,
-        domain: account.domain || appDomain,
+        username: username,
+        domain: domain || appDomain,
         type: 'peer',
         deviceId: account.deviceId
       };
