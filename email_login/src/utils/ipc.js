@@ -32,6 +32,10 @@ export const updateAccount = async params => {
 
 /*  Criptext Client
 ----------------------------- */
+export const canLogin = async params => {
+  return await callMain('client-can-login', params);
+};
+
 export const checkAvailableUsername = async username => {
   return await callMain('client-check-available-username', username);
 };
@@ -40,8 +44,8 @@ export const linkAuth = async newDeviceData => {
   return await callMain('client-link-auth', newDeviceData);
 };
 
-export const linkBegin = async username => {
-  return await callMain('client-link-begin', username);
+export const linkBegin = async params => {
+  return await callMain('client-link-begin', params);
 };
 
 export const linkStatus = async () => {
