@@ -13,6 +13,7 @@ import {
   throwError
 } from './../utils/ipc';
 import string from './../lang';
+import { appDomain } from '../utils/const';
 
 const messages = string.loading.messages;
 
@@ -69,11 +70,18 @@ class LoadingWrapper extends Component {
         this.createNewAccount();
       } else if (this.props.loadingType === loadingTypes.LOGIN) {
         const { recipientId, deviceId, name, deviceType } = remoteData;
+        let isRecipientApp = false;
+        let username = recipientId;
+        if (recipientId.includes(`@${appDomain}`)) {
+          isRecipientApp = true;
+          [username] = recipientId.split('@');
+        }
         this.createAccountWithNewDevice({
-          recipientId,
+          recipientId: username,
           deviceId,
           name,
-          deviceType
+          deviceType,
+          isRecipientApp
         });
       }
     }
@@ -125,14 +133,16 @@ class LoadingWrapper extends Component {
     recipientId,
     deviceId,
     name,
-    deviceType
+    deviceType,
+    isRecipientApp
   }) => {
     try {
       const { accountId } = await signal.createAccountWithNewDevice({
         recipientId,
         deviceId,
         name,
-        deviceType
+        deviceType,
+        isRecipientApp
       });
       if (!accountId) {
         this.loadingThrowError();

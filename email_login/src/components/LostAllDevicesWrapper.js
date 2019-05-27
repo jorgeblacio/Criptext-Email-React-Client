@@ -13,6 +13,7 @@ import { hashPassword } from '../utils/HashUtils';
 import { parseRateLimitBlockingTime } from './../utils/TimeUtils';
 import { PopupTypes } from './LoginPopup';
 import string from './../lang';
+import { appDomain } from '../utils/const';
 
 const { passwordLogin } = string;
 
@@ -28,7 +29,7 @@ class LostDevicesWrapper extends Component {
     super(props);
     this.state = {
       values: {
-        username: props.usernameValue,
+        usernameOrEmailAddress: props.value,
         password: ''
       },
       disabled: true,
@@ -44,21 +45,21 @@ class LostDevicesWrapper extends Component {
     return (
       <LostAllDevices
         {...this.props}
+        disabled={this.state.disabled}
         handleForgot={this.handleForgot}
+        isLoading={this.state.isLoading}
         onCLickSignInWithPassword={this.handleClickSignInWithPassword}
         onChangeField={this.handleChangeField}
-        disabled={this.state.disabled}
+        onDismissPopup={this.onDismissPopup}
+        popupContent={this.state.popupContent}
         validator={this.validatePassword}
         values={this.state.values}
-        isLoading={this.state.isLoading}
-        popupContent={this.state.popupContent}
-        onDismissPopup={this.onDismissPopup}
       />
     );
   }
 
   validatePassword = () => {
-    const password = this.state.values['password'];
+    const password = this.state.values.password;
     return validatePassword(password);
   };
 
@@ -89,23 +90,30 @@ class LostDevicesWrapper extends Component {
         isLoading: true,
         disabled: true
       });
-      const username = this.state.values.username;
+      const [
+        username,
+        domain = appDomain
+      ] = this.state.values.usernameOrEmailAddress.split('@');
       const password = this.state.values.password;
       const hashedPassword = hashPassword(password);
       const submittedData = {
         username,
+        domain,
         password: hashedPassword
       };
       const res = await login(submittedData);
       const { status, body, headers } = res;
-      this.handleLoginStatus(status, body, headers, username);
+      // eslint-disable-next-line fp/no-let
+      let recipientId = this.state.values.usernameOrEmailAddress;
+      // eslint-disable-next-line fp/no-mutation
+      if (domain === appDomain) recipientId = username;
+      this.handleLoginStatus(status, body, headers, recipientId);
     }
   };
 
-  handleLoginStatus = (status, body, headers, username) => {
+  handleLoginStatus = (status, body, headers, recipientId) => {
     switch (status) {
       case LOGIN_STATUS.SUCCESS: {
-        const recipientId = username;
         const { deviceId, name } = body;
         openCreateKeysLoadingWindow({
           loadingType: 'login',
@@ -151,8 +159,15 @@ class LostDevicesWrapper extends Component {
   handleForgot = async ev => {
     ev.preventDefault();
     ev.stopPropagation();
-    const recipientId = this.state.values.username;
-    const { status, text } = await resetPassword(recipientId);
+    const [
+      recipientId,
+      domain = appDomain
+    ] = this.state.values.usernameOrEmailAddress.split('@');
+    const params = {
+      recipientId,
+      domain
+    };
+    const { status, text } = await resetPassword(params);
     const customText = this.getForgotPasswordMessage(status, text);
     const messages = passwordLogin.forgotPasswordMessage;
     switch (status) {
