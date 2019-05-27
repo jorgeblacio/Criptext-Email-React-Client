@@ -120,7 +120,7 @@ const createAccount = async ({
   await createSystemLabels();
   const email = `${recipientId}@${appDomain}`;
   await createOwnContact(name, email, newAccount.id);
-  return true;
+  return newAccount.id;
 };
 
 const createAccountWithNewDevice = async ({
@@ -264,6 +264,7 @@ const createAccountToDB = async ({
   privKey,
   pubKey,
   recipientId,
+  isRecipientApp,
   registrationId,
   preKeyIds,
   preKeyPairArray,
@@ -288,7 +289,7 @@ const createAccountToDB = async ({
       throw CustomError(string.errors.saveLocal);
     }
     await createSystemLabels();
-    const email = `${recipientId}@${appDomain}`;
+    const email = isRecipientApp ? `${recipientId}@${appDomain}` : recipientId;
     await createOwnContact(name, email);
   } else {
     if (!existsAccount.isLoggedIn) {

@@ -204,9 +204,17 @@ class LoadingWrapper extends Component {
       },
       async () => {
         this.incrementPercentage();
+        let isRecipientApp = false;
+        let username = remoteData.recipientId;
+        if (remoteData.recipientId.includes(`@${appDomain}`)) {
+          isRecipientApp = true;
+          [username] = remoteData.recipientId.split('@');
+        }
         const newAccountData = {
           ...remoteData,
-          ...this.state.accountData
+          ...this.state.accountData,
+          recipientId: username,
+          isRecipientApp
         };
         const accountId = await signal.createAccountToDB(newAccountData);
         const response = await downloadBackupFile(address);

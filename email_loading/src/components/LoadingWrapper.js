@@ -105,13 +105,11 @@ class LoadingWrapper extends Component {
       userCredentials['recoveryEmail'] = remoteData.recoveryEmail;
     }
     try {
-      const accountResponse = await signal.createAccount(userCredentials);
-      if (accountResponse === false) {
-        this.loadingThrowError();
-      }
-      if (accountResponse === true) {
+      const accountId = await signal.createAccount(userCredentials);
+      if (accountId) {
+        this.accountId = accountId;
         this.setState({
-          accountResponse,
+          accountResponse: true,
           failed: false
         });
       }
@@ -185,7 +183,7 @@ class LoadingWrapper extends Component {
       clearTimeout(this.state.timeout);
       this.setState({ percent: 99 }, () => {
         const accountId = this.accountId;
-        const recipientId = remoteData.recipientId;
+        const recipientId = remoteData.recipientId || remoteData.username;
         this.checkMailboxWindowIsReady({ accountId, recipientId });
       });
     }
@@ -208,7 +206,7 @@ class LoadingWrapper extends Component {
             disableEventRequests();
             openMailboxWindow({ accountId, recipientId });
             closeCreatingKeysLoadingWindow();
-          }, 2500);
+          }, 2000);
         }
       );
     } else {
