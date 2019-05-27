@@ -635,7 +635,9 @@ const sendNewEmailNotification = ({ account }) => {
 };
 
 const updateOwnContact = async () => {
-  const ownEmail = `${myAccount.recipientId}@${appDomain}`;
+  const ownEmail = myAccount.recipientId.includes('@')
+    ? myAccount.recipientId
+    : `${myAccount.recipientId}@${appDomain}`;
   const accountName = myAccount.name;
   if (accountName) {
     await updateContactByEmail({ email: ownEmail, name: accountName });
@@ -989,7 +991,9 @@ ipcRenderer.on(
 
 export const selectAccountAsActive = async ({ accountId, recipientId }) => {
   await changeAccountApp({ accountId });
-  const email = `${recipientId}@${appDomain}`;
+  const email = recipientId.includes('@')
+    ? recipientId
+    : `${recipientId}@${appDomain}`;
   showLoggedAsMessage(email);
   startSocket(myAccount.jwt);
   enableEventRequests();
