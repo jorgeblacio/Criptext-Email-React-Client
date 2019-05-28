@@ -29,6 +29,7 @@ const loadingTypes = {
 
 const delay = 85;
 const responseMaxDelay = 300;
+const lastMessageDelay = 2000;
 
 class LoadingWrapper extends Component {
   constructor(props) {
@@ -206,7 +207,7 @@ class LoadingWrapper extends Component {
             disableEventRequests();
             openMailboxWindow({ accountId, recipientId });
             closeCreatingKeysLoadingWindow();
-          }, 2000);
+          }, lastMessageDelay);
         }
       );
     } else {
@@ -217,7 +218,7 @@ class LoadingWrapper extends Component {
         () => {
           this.mailboxIsReadyTimeout = setTimeout(() => {
             this.checkMailboxWindowIsReady({ accountId, recipientId });
-          }, 2000);
+          }, lastMessageDelay);
         }
       );
     }
