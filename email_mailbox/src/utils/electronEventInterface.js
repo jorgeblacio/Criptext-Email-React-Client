@@ -75,7 +75,8 @@ import {
 import {
   fetchAcknowledgeEvents,
   fetchEvents,
-  fetchEventAction
+  fetchEventAction,
+  fetchGetSingleEvent
 } from './FetchUtils';
 import string from './../lang';
 
@@ -125,13 +126,17 @@ export const updateBreakValues = () => {
   stopGettingEvents();
 };
 
-const parseAndStoreEventsBatch = async ({ events, hasMoreEvents }) => {
+const parseAndStoreEventsBatch = async ({
+  events,
+  hasMoreEvents,
+  accountId,
+  optionalToken
+}) => {
   labelIdsEvent = new Set();
   threadIdsEvent = new Set();
   badgeLabelIdsEvent = new Set();
   labelsEvent = {};
   avatarHasChanged = false;
-
   const rowIds = [];
   const completedTask = events.reduce((count, event) => {
     if (event.cmd === SocketCommand.NEW_EMAIL) {
@@ -152,7 +157,7 @@ const parseAndStoreEventsBatch = async ({ events, hasMoreEvents }) => {
         threadIds,
         labels,
         badgeLabelIds
-      } = await handleEvent(event);
+      } = await handleEvent({ ...event, accountId, optionalToken });
       rowIds.push(rowid);
       if (threadIds)
         threadIdsEvent = new Set([...threadIdsEvent, ...threadIds]);
@@ -256,7 +261,7 @@ export const getGroupEvents = async ({
     if (!hasMoreEvents) {
       await updateOwnContact();
       if (showNotification) {
-        sendNewEmailNotification();
+        sendNewEmailNotification({ account: myAccount });
       }
       totalEmailsPending = null;
       stopGettingEvents();
@@ -352,7 +357,12 @@ export const handleEvent = incomingEvent => {
   }
 };
 
-const handleNewMessageEvent = async ({ rowid, params }) => {
+const handleNewMessageEvent = async ({
+  rowid,
+  params,
+  accountId,
+  optionalToken
+}) => {
   const {
     bcc,
     bccArray,
@@ -414,7 +424,9 @@ const handleNewMessageEvent = async ({ rowid, params }) => {
         bodyKey: metadataKey,
         recipientId,
         deviceId,
-        messageType
+        messageType,
+        optionalToken,
+        accountId
       });
       body = cleanEmailBody(decryptedBody);
       headers = decryptedHeaders;
@@ -430,7 +442,8 @@ const handleNewMessageEvent = async ({ rowid, params }) => {
               fileKey,
               messageType,
               recipientId,
-              deviceId
+              deviceId,
+              accountId
             });
             const [key, iv] = decrypted.split(':');
             return { key, iv };
@@ -445,7 +458,8 @@ const handleNewMessageEvent = async ({ rowid, params }) => {
           fileKey,
           messageType,
           recipientId,
-          deviceId
+          deviceId,
+          accountId
         });
         const [key, iv] = decrypted.split(':');
         myFileKeys = files.map(() => ({ key, iv }));
@@ -502,7 +516,7 @@ const handleNewMessageEvent = async ({ rowid, params }) => {
       labelIds.push(SpamLabelId);
     }
     const emailData = {
-      accountId: myAccount.id,
+      accountId: accountId || myAccount.id,
       email,
       labels: labelIds,
       files: filesData,
@@ -538,7 +552,7 @@ const handleNewMessageEvent = async ({ rowid, params }) => {
     }
     notificationPreview = prevEmail.preview;
   }
-  if (isToMe && !isSpam) {
+  if (!isSpam) {
     const parsedContact = parseContactRow(from);
     addEmailToNotificationList({
       senderInfo: parsedContact.name || parsedContact.email,
@@ -569,7 +583,8 @@ const addEmailToNotificationList = ({
   });
 };
 
-const sendNewEmailNotification = () => {
+const sendNewEmailNotification = ({ account }) => {
+  const switchToAccount = account.id === myAccount.id ? null : account;
   if (newEmailNotificationList.length <= 3) {
     newEmailNotificationList.forEach(notificationData => {
       const {
@@ -581,7 +596,12 @@ const sendNewEmailNotification = () => {
       const message = getShowEmailPreviewStatus()
         ? `${emailSubject}\n${emailPreview}`
         : `${emailSubject}`;
-      showNotificationApp({ title: senderInfo, message, threadId });
+      showNotificationApp({
+        account: switchToAccount,
+        title: `${senderInfo} [${account.recipientId}@${appDomain}]`,
+        message,
+        threadId
+      });
     });
   } else if (newEmailNotificationList.length > 3) {
     const title = 'Criptext';
@@ -589,7 +609,12 @@ const sendNewEmailNotification = () => {
       string.notification.newEmailGroup.prefix +
       newEmailNotificationList.length +
       string.notification.newEmailGroup.sufix;
-    showNotificationApp({ title, message, threadId: null });
+    showNotificationApp({
+      account: switchToAccount,
+      title,
+      message,
+      threadId: null
+    });
   }
   newEmailNotificationList = [];
 };
@@ -937,9 +962,12 @@ ipc.answerMain('get-events', () => {
   sendLoadEventsEvent({});
 });
 
-ipcRenderer.on('refresh-window-logged-as', (ev, { accountId, recipientId }) => {
-  emitter.emit(Event.LOAD_APP, { accountId, recipientId });
-});
+ipcRenderer.on(
+  'refresh-window-logged-as',
+  (ev, { accountId, recipientId, selectedThreadId }) => {
+    emitter.emit(Event.LOAD_APP, { accountId, recipientId, selectedThreadId });
+  }
+);
 
 export const selectAccountAsActive = async ({ accountId, recipientId }) => {
   await changeAccountApp({ accountId });
@@ -1346,11 +1374,43 @@ ipcRenderer.on(TOKEN_UPDATED, async (_, token) => {
   await updatePushToken(token);
 });
 
-ipcRenderer.on(NOTIFICATION_RECEIVED, () => {
+ipcRenderer.on(NOTIFICATION_RECEIVED, async (_, { data }) => {
   const isDisabledParsingEvents = checkDisableRequests();
   if (isDisabledParsingEvents) return;
 
-  sendLoadEventsEvent({ showNotification: true });
+  try {
+    const { account, rowId } = data;
+    let eventAccount = {};
+    let optionalToken = '';
+    if (account === myAccount.recipientId) {
+      eventAccount = myAccount;
+      optionalToken = null;
+    } else {
+      eventAccount = myAccount.logged[account];
+      optionalToken = eventAccount ? eventAccount.jwt : '';
+    }
+
+    if (!eventAccount) {
+      return;
+    }
+
+    const eventData = await fetchGetSingleEvent({ rowId, optionalToken });
+
+    await parseAndStoreEventsBatch({
+      events: [eventData],
+      hasMoreEvents: false,
+      accountId: eventAccount.id,
+      optionalToken
+    });
+    sendNewEmailNotification({ account: eventAccount });
+
+    if (eventAccount.recipientId === myAccount.recipientId) {
+      sendLoadEventsEvent({ showNotification: true });
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
 });
 
 ipcRenderer.send(START_NOTIFICATION_SERVICE, senderNotificationId);

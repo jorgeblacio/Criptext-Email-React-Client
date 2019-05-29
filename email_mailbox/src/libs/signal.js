@@ -1,10 +1,11 @@
 /*global libsignal util*/
 import { getSessionRecordIds, insertPreKeys } from './../utils/ipc';
 import SignalProtocolStore from './store';
+import ScopedSignalProtocolStore from './scopedStore';
 import { fetchEmailBody } from '../utils/FetchUtils';
 
 const KeyHelper = libsignal.KeyHelper;
-const store = new SignalProtocolStore();
+const myStore = new SignalProtocolStore();
 const PREKEY_INITIAL_QUANTITY = 100;
 const ciphertextType = {
   CIPHERTEXT: 1,
@@ -15,9 +16,12 @@ const decryptEmail = async ({
   bodyKey,
   recipientId,
   deviceId,
-  messageType
+  messageType,
+  optionalToken,
+  accountId
 }) => {
-  const { status, body } = await fetchEmailBody({ bodyKey });
+  const store = accountId ? new ScopedSignalProtocolStore(accountId) : myStore;
+  const { status, body } = await fetchEmailBody({ bodyKey, optionalToken });
   if (status !== 200) {
     return;
   }
@@ -70,8 +74,10 @@ const decryptFileKey = async ({
   fileKey,
   messageType,
   recipientId,
-  deviceId
+  deviceId,
+  accountId
 }) => {
+  const store = accountId ? new ScopedSignalProtocolStore(accountId) : myStore;
   const fileKeyEncrypted = util.toArrayBufferFromBase64(fileKey);
   const addressFrom = new libsignal.SignalProtocolAddress(
     recipientId,
@@ -87,6 +93,7 @@ const decryptFileKey = async ({
 };
 
 const decryptKey = async ({ text, recipientId, deviceId, messageType = 3 }) => {
+  const store = myStore;
   if (typeof deviceId !== 'number' && typeof messageType !== 'number') {
     return text;
   }
@@ -106,6 +113,7 @@ const decryptKey = async ({ text, recipientId, deviceId, messageType = 3 }) => {
 
 const generateAndInsertMorePreKeys = async () => {
   const currentPreKeyIds = await getSessionRecordIds();
+  const store = myStore;
   if (currentPreKeyIds.length === PREKEY_INITIAL_QUANTITY) return;
 
   const preKeyIds = Array.apply(null, { length: PREKEY_INITIAL_QUANTITY }).map(

@@ -119,11 +119,16 @@ ipc.answerRenderer('fs-delete-email-content', async params => {
 });
 
 ipc.answerRenderer('db-create-email', async params => {
+  const [account] = await dbManager.getAccountByParams({
+    id: params.accountId
+  });
   await fileUtils.saveEmailBody({
     body: params.body,
     headers: params.headers,
     metadataKey: parseInt(params.email.key),
-    username: getUsername()
+    username: account.recipientId.includes('@')
+      ? account.recipientId
+      : `${account.recipientId}@${APP_DOMAIN}`
   });
   return await dbManager.createEmail(params);
 });
