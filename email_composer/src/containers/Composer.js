@@ -221,7 +221,8 @@ class ComposerWrapper extends Component {
           id: account.id,
           emailAddress: `${account.recipientId}@${appDomain}`,
           recipientId: account.recipientId,
-          deviceId: account.deviceId
+          deviceId: account.deviceId,
+          encryptToExternals: account.encryptToExternals
         };
         accounts.push(item);
         if (account.isActive) {
@@ -522,7 +523,10 @@ class ComposerWrapper extends Component {
       this.state.toEmails.length +
       this.state.ccEmails.length +
       this.state.bccEmails.length;
-    if (hasNonCriptextRecipients && !isVerified) {
+    const selectedAccount = this.state.accountSelected;
+    const account =
+      selectedAccount.id === myAccount.id ? myAccount : selectedAccount;
+    if (hasNonCriptextRecipients && !isVerified && account.encryptToExternals) {
       this.setState({ displayNonCriptextPopup: true });
     } else if (recipientsAmount >= MAX_RECIPIENTS_AMOUNT) {
       this.setState({ status: Status.DISABLED }, () => {
