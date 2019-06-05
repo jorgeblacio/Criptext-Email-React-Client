@@ -12,6 +12,7 @@ class Account {
     this.signatureEnabled = accountObj.signatureEnabled;
     this.other = {};
     this.logged = accountObj.logged;
+    this.encryptToExternals = accountObj.encryptToExternals;
   }
 
   update(accountObj) {
@@ -30,6 +31,10 @@ class Account {
         : this.signatureEnabled;
     this.other = accountObj.other || this.other;
     this.logged = accountObj.logged || this.logged;
+    this.encryptToExternals =
+      accountObj.encryptToExternals !== undefined
+        ? accountObj.encryptToExternals
+        : this.encryptToExternals;
   }
 
   getIdentityKeyPair() {

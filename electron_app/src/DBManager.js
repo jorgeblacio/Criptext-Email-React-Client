@@ -88,6 +88,7 @@ const getAccountByParams = params => {
 const updateAccount = async (
   {
     deviceId,
+    encryptToExternals,
     jwt,
     refreshToken,
     name,
@@ -104,6 +105,8 @@ const updateAccount = async (
 ) => {
   const params = noNulls({
     deviceId,
+    encryptToExternals:
+      typeof encryptToExternals === 'boolean' ? encryptToExternals : undefined,
     jwt,
     refreshToken,
     name,
@@ -116,7 +119,6 @@ const updateAccount = async (
     isLoggedIn: typeof isLoggedIn === 'boolean' ? isLoggedIn : undefined,
     isActive: typeof isActive === 'boolean' ? isActive : undefined
   });
-
   const knex = trx || db;
   const response = await knex
     .table(Table.ACCOUNT)
