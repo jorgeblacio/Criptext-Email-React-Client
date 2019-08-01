@@ -3,8 +3,10 @@ const {
   db,
   cleanDataBase,
   cleanDataLogout,
+  cleanForAlice,
   createSignalTables,
   createTables,
+  hasColumnPreKeyRecordLength,
   Table
 } = require('./models.js');
 const { formContactsRow } = require('./utils/dataTableUtils.js');
@@ -1370,6 +1372,7 @@ const closeDB = () => {
 module.exports = {
   cleanDataBase,
   cleanDataLogout,
+  cleanForAlice,
   closeDB,
   createAccount,
   createContact,
@@ -1432,6 +1435,7 @@ module.exports = {
   getSignedPreKey,
   getTrashExpiredEmails,
   getFilesByTokens,
+  hasColumnPreKeyRecordLength,
   updateAccount,
   updateContactByEmail,
   updateContactSpamScore,

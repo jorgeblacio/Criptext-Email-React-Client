@@ -8,7 +8,7 @@ import {
   checkUserGuideSteps
 } from '../utils/electronEventInterface';
 import { processPendingEvents } from '../utils/ipc';
-import { LabelType, getPendingRestoreStatus } from '../utils/electronInterface';
+import { LabelType, needsUpgrade, getPendingRestoreStatus } from '../utils/electronInterface';
 import { SectionType } from '../utils/const';
 import {
   addLabels,
@@ -19,6 +19,7 @@ import {
 import { USER_GUIDE_STEPS } from './UserGuide';
 
 const MAILBOX_POPUP_TYPES = {
+  MIGRATE_ALICE: 'migrate-alice',
   ACCOUNT_DELETED: 'account-deleted',
   CREATING_BACKUP_FILE: 'creating-backup-file',
   DEVICE_REMOVED: 'device-removed',
@@ -34,12 +35,15 @@ const THREADS_SIZE = 22;
 class PanelWrapper extends Component {
   constructor(props) {
     super(props);
+
+    const mailboxType = (needsUpgrade()) ? MAILBOX_POPUP_TYPES.MIGRATE_ALICE : undefined;
+
     this.state = {
-      isHiddenMailboxPopup: true,
+      isHiddenMailboxPopup: !mailboxType,
       isOpenActivityPanel: false,
       isOpenSideBar: true,
       isOpenWelcome: true,
-      mailboxPopupType: undefined,
+      mailboxPopupType: mailboxType,
       sectionSelected: {
         type: SectionType.MAILBOX,
         params: {
