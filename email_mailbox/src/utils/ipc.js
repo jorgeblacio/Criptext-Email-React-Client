@@ -546,4 +546,4 @@ export const reportContentUnencrypted = async error => {
 ----------------------------- */
 export const upgradeAccount = async params => {
   return await callMain('upgrade-account', params);
-}
+};

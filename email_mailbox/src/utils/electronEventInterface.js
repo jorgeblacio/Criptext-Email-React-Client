@@ -115,7 +115,11 @@ const stopGettingEvents = () => {
   }
 };
 
-const parseAndStoreEventsBatch = async ({ events, hasMoreEvents, useLegacy }) => {
+const parseAndStoreEventsBatch = async ({
+  events,
+  hasMoreEvents,
+  useLegacy
+}) => {
   labelIdsEvent = new Set();
   threadIdsEvent = new Set();
   badgeLabelIdsEvent = new Set();
@@ -286,9 +290,8 @@ export const handleEvent = (incomingEvent, useLegacy) => {
     case SocketCommand.NEW_EMAIL: {
       if (useLegacy) {
         return handleNewMessageEventLegacy(incomingEvent);
-      } else {
-        return handleNewMessageEvent(incomingEvent);
       }
+      return handleNewMessageEvent(incomingEvent);
     }
     case SocketCommand.EMAIL_TRACKING_UPDATE: {
       return handleEmailTrackingUpdate(incomingEvent);
@@ -462,7 +465,10 @@ const handleNewMessageEventLegacy = async ({ rowid, params }) => {
     let body = '',
       headers;
     try {
-      const { decryptedBody, decryptedHeaders } = await signalLegacy.decryptEmail({
+      const {
+        decryptedBody,
+        decryptedHeaders
+      } = await signalLegacy.decryptEmail({
         bodyKey: metadataKey,
         recipientId,
         deviceId,
@@ -677,10 +683,14 @@ const handleNewMessageEvent = async ({ rowid, params }) => {
   let emailThreadId = threadId;
   if (!prevEmail) {
     let body = '',
-      headers, 
+      headers,
       myFileKeys;
     try {
-      const { decryptedBody, decryptedHeaders, decryptedFileKeys } = await signal.decryptEmail({
+      const {
+        decryptedBody,
+        decryptedHeaders,
+        decryptedFileKeys
+      } = await signal.decryptEmail({
         bodyKey: metadataKey,
         recipientId,
         deviceId,
@@ -689,13 +699,15 @@ const handleNewMessageEvent = async ({ rowid, params }) => {
       });
       body = cleanEmailBody(decryptedBody);
       headers = decryptedHeaders;
-      myFileKeys = decryptedFileKeys ? decryptedFileKeys.map( fileKey => {
-        const fileKeySplit = fileKey.split(":");
-        return {
-          key: fileKeySplit[0],
-          iv: fileKeySplit[1]
-        }
-      }) : null;
+      myFileKeys = decryptedFileKeys
+        ? decryptedFileKeys.map(fileKey => {
+            const fileKeySplit = fileKey.split(':');
+            return {
+              key: fileKeySplit[0],
+              iv: fileKeySplit[1]
+            };
+          })
+        : null;
     } catch (e) {
       body = 'Content unencrypted';
       reportContentUnencrypted(e);
