@@ -68,7 +68,7 @@ async function initApp() {
     console.log(ex);
   }
 
-  startAlice();
+  //startAlice();
 
   const [existingAccount] = await dbManager.getAccount();
   if (existingAccount) {
