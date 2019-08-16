@@ -18,7 +18,11 @@ const {
 const { getUsername, genUUID } = require('./../utils/stringUtils');
 const { showWindows } = require('./../windows/windowUtils');
 const { restartSocket } = require('./../socketClient');
+<<<<<<< HEAD
 const { checkAlive } = require('./../reachabilityTask');
+=======
+const { restartAlice } = require('./../aliceManager');
+>>>>>>> adding custom port to alice
 
 ipc.answerRenderer('close-mailbox', () => {
   mailboxWindow.close();
@@ -128,4 +132,8 @@ ipc.answerRenderer('generate-label-uuid', genUUID);
 ipc.answerRenderer('restart-connection', jwt => {
   restartSocket({ jwt });
   checkAlive(true);
+});
+
+ipc.answerRenderer('restart-alice', () => {
+  restartAlice();
 });
