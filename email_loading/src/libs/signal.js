@@ -101,20 +101,19 @@ const createAcountAndGetKeyBundle = async ({
   name,
   deviceType
 }) => {
-  const accountRes = await aliceRequestWrapper( () => {
+  const accountRes = await aliceRequestWrapper(() => {
     return createAccountCredentials({
       recipientId,
       deviceId,
       name
     });
-  }); 
-  console.log(accountRes);
+  });
   if (accountRes.status !== 200) {
     throw CustomError(string.errors.updateAccountData);
   }
-  const keybundleRes = await aliceRequestWrapper( () => {
+  const keybundleRes = await aliceRequestWrapper(() => {
     return generateKeyBundle({ recipientId, deviceId });
-  }); 
+  });
   if (keybundleRes.status !== 200) {
     throw CustomError(string.errors.prekeybundleFailed);
   }
@@ -258,14 +257,14 @@ const decryptKey = async ({ text, recipientId, deviceId, messageType = 3 }) => {
   if (typeof deviceId !== 'number' && typeof messageType !== 'number') {
     return text;
   }
-  const res = await aliceRequestWrapper( () => {
+  const res = await aliceRequestWrapper(() => {
     return fetchDecryptKey({
       recipientId,
       deviceId,
       messageType,
       key: text
     });
-  }); 
+  });
   const decryptedText = await res.arrayBuffer();
   return decryptedText;
 };
@@ -279,25 +278,23 @@ const encryptKeyForNewDevice = async ({ recipientId, deviceId, key }) => {
     }
     await setTimeout(() => {}, 5000);
   }
-  const res = await aliceRequestWrapper( () => {
+  const res = await aliceRequestWrapper(() => {
     return createSession({
       accountRecipientId: recipientId,
       keybundles: [newKeyBundle]
     });
-  }); 
+  });
   if (res.status !== 200) {
-    console.log("GG");
     throw CustomError(string.errors.prekeybundleFailed);
   }
-  const encryptRes = await aliceRequestWrapper( () => {
+  const encryptRes = await aliceRequestWrapper(() => {
     return encryptKey({
       recipientId,
       deviceId,
       key
     });
-  })
+  });
   if (encryptRes.status !== 200) {
-    console.log("WP");
     throw CustomError(string.errors.prekeybundleFailed);
   }
 
@@ -305,7 +302,7 @@ const encryptKeyForNewDevice = async ({ recipientId, deviceId, key }) => {
   return encryptedKey;
 };
 
-const aliceRequestWrapper = async (func) => {
+const aliceRequestWrapper = async func => {
   let retries = 3;
   let res;
   while (retries >= 0) {
@@ -319,7 +316,7 @@ const aliceRequestWrapper = async (func) => {
     }
   }
   return res;
-}
+};
 
 export default {
   createAccount,

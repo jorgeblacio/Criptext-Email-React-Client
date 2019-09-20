@@ -88,7 +88,7 @@ const closeAlice = () => {
 
 const restartAlice = async () => {
   console.log('Restarting ALice');
-  const isReachable = await checkReachability()
+  const isReachable = await checkReachability();
   if (isReachable) {
     return;
   }
@@ -97,41 +97,41 @@ const restartAlice = async () => {
   await checkReachability();
 };
 
-const isReachable = async () => {
+const isReachable = () => {
   const options = {
     hostname: 'localhost',
     port,
     path: '/ping',
     method: 'GET',
     timeout: 500
-  }
+  };
 
-  return new Promise( (resolve) => {
+  return new Promise(resolve => {
     const req = http.request(options, res => {
-      console.log(`statusCode: ${res.statusCode}`)
-    
+      console.log(`statusCode: ${res.statusCode}`);
+
       res.on('data', body => {
         console.log(body.toString());
         resolve(body.toString().trim() === 'pong');
-      })
-    })
-    
-    req.on('error', error => {
-      console.log(error)
-      resolve(false)
-    })
-    
-    req.end()
-  })
-}
+      });
+    });
 
-const sleep = async (time) => {
-  return new Promise( (resolve) => {
-    setTimeout( () => {
+    req.on('error', error => {
+      console.log(error);
+      resolve(false);
+    });
+
+    req.end();
+  });
+};
+
+const sleep = time => {
+  return new Promise(resolve => {
+    setTimeout(() => {
       resolve();
-    }, time)
-  })
-}
+    }, time);
+  });
+};
 
 const checkReachability = async () => {
   let retries = 3;
@@ -143,8 +143,8 @@ const checkReachability = async () => {
     retries--;
     await sleep(500);
   }
-  return false
-}
+  return false;
+};
 
 module.exports = {
   startAlice,

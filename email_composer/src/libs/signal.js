@@ -92,12 +92,12 @@ const createEmails = async (
   });
   while (myKeyBundles.length > 0) {
     const keyBundlesBatch = myKeyBundles.splice(0, 30);
-    await aliceRequestWrapper( () => {
+    await aliceRequestWrapper(() => {
       return createSession({
         accountRecipientId: myAccount.recipientId,
         keybundles: keyBundlesBatch
       });
-    })
+    });
   }
 
   const criptextEmailsByRecipientId = {};
@@ -142,7 +142,7 @@ const createEmails = async (
               return [...result, `${file.key}:${file.iv}`];
             }, [])
           : null;
-        const res = await aliceRequestWrapper( () => {
+        const res = await aliceRequestWrapper(() => {
           return encryptEmail({
             accountRecipientId: myAccount.recipientId,
             body,
@@ -434,7 +434,7 @@ const encryptExternalEmail = async ({
   };
 };
 
-const aliceRequestWrapper = async (func) => {
+const aliceRequestWrapper = async func => {
   let retries = 3;
   let res;
   while (retries >= 0) {
@@ -448,6 +448,6 @@ const aliceRequestWrapper = async (func) => {
     }
   }
   return res;
-}
+};
 
 export { encryptPostEmail, createDummyKeyBundle };

@@ -27,10 +27,10 @@
         "../db_interface/src/axolotl/SessionRecord.cpp",
         "../db_interface/src/axolotl/SignedPreKey.cpp"
       ],
-      "cflags": ["-Wall", "-std=c++1z"],
+      "cflags": ["-Wall", "-std=c++17"],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
-      'cflags_cc': ["-std=c++1z"],
+      'cflags_cc': ["-std=c++17"],
       "include_dirs" : [
         "/usr/local/include",
         "/usr/include"
