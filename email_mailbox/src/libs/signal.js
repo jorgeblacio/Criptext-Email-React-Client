@@ -6,7 +6,11 @@ import {
 } from './../utils/ipc';
 import SignalProtocolStore from './store';
 import { fetchEmailBody } from '../utils/FetchUtils';
-import { fetchDecryptBody, generateMorePreKeys } from '../utils/ApiUtils';
+import {
+  fetchDecryptKey,
+  fetchDecryptBody,
+  generateMorePreKeys
+} from '../utils/ApiUtils';
 import { myAccount } from '../utils/electronInterface';
 
 const store = new SignalProtocolStore();
@@ -115,18 +119,14 @@ const decryptKey = async ({ text, recipientId, deviceId, messageType = 3 }) => {
   if (typeof deviceId !== 'number' && typeof messageType !== 'number') {
     return text;
   }
-  const textEncrypted = util.toArrayBufferFromBase64(text);
-  const addressFrom = new libsignal.SignalProtocolAddress(
+  const res = await fetchDecryptKey({
     recipientId,
-    deviceId
-  );
-  const sessionCipher = new libsignal.SessionCipher(store, addressFrom);
-  const binaryText = await decryptMessage(
-    sessionCipher,
-    textEncrypted,
-    messageType
-  );
-  return binaryText;
+    deviceId,
+    messageType,
+    key: text
+  });
+  const decryptedText = await res.arrayBuffer();
+  return decryptedText;
 };
 
 const generateAndInsertMorePreKeys = async () => {
