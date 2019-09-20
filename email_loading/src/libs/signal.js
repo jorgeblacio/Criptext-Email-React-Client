@@ -17,7 +17,8 @@ import {
   updateAccount,
   getSystemLanguage,
   getAllLabels,
-  getContactByEmails
+  getContactByEmails,
+  restartAlice
 } from './../utils/ipc';
 import {
   createAccountCredentials,
@@ -100,15 +101,20 @@ const createAcountAndGetKeyBundle = async ({
   name,
   deviceType
 }) => {
-  const accountRes = await createAccountCredentials({
-    recipientId,
-    deviceId,
-    name
-  });
+  const accountRes = await aliceRequestWrapper( () => {
+    return createAccountCredentials({
+      recipientId,
+      deviceId,
+      name
+    });
+  }); 
+  console.log(accountRes);
   if (accountRes.status !== 200) {
     throw CustomError(string.errors.updateAccountData);
   }
-  const keybundleRes = await generateKeyBundle({ recipientId, deviceId });
+  const keybundleRes = await aliceRequestWrapper( () => {
+    return generateKeyBundle({ recipientId, deviceId });
+  }); 
   if (keybundleRes.status !== 200) {
     throw CustomError(string.errors.prekeybundleFailed);
   }
@@ -252,12 +258,14 @@ const decryptKey = async ({ text, recipientId, deviceId, messageType = 3 }) => {
   if (typeof deviceId !== 'number' && typeof messageType !== 'number') {
     return text;
   }
-  const res = await fetchDecryptKey({
-    recipientId,
-    deviceId,
-    messageType,
-    key: text
-  });
+  const res = await aliceRequestWrapper( () => {
+    return fetchDecryptKey({
+      recipientId,
+      deviceId,
+      messageType,
+      key: text
+    });
+  }); 
   const decryptedText = await res.arrayBuffer();
   return decryptedText;
 };
@@ -271,25 +279,47 @@ const encryptKeyForNewDevice = async ({ recipientId, deviceId, key }) => {
     }
     await setTimeout(() => {}, 5000);
   }
-  const res = await createSession({
-    accountRecipientId: recipientId,
-    keybundles: [newKeyBundle]
-  });
+  const res = await aliceRequestWrapper( () => {
+    return createSession({
+      accountRecipientId: recipientId,
+      keybundles: [newKeyBundle]
+    });
+  }); 
   if (res.status !== 200) {
+    console.log("GG");
     throw CustomError(string.errors.prekeybundleFailed);
   }
-  const encryptRes = await encryptKey({
-    recipientId,
-    deviceId,
-    key
-  });
+  const encryptRes = await aliceRequestWrapper( () => {
+    return encryptKey({
+      recipientId,
+      deviceId,
+      key
+    });
+  })
   if (encryptRes.status !== 200) {
+    console.log("WP");
     throw CustomError(string.errors.prekeybundleFailed);
   }
 
   const encryptedKey = await encryptRes.text();
   return encryptedKey;
 };
+
+const aliceRequestWrapper = async (func) => {
+  let retries = 3;
+  let res;
+  while (retries >= 0) {
+    retries -= 1;
+    try {
+      res = await func();
+      if (res.status === 200) break;
+    } catch (ex) {
+      if (ex.toString() !== 'TypeError: Failed to fetch') break;
+      await restartAlice();
+    }
+  }
+  return res;
+}
 
 export default {
   createAccount,

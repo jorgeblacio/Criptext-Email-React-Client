@@ -27,33 +27,24 @@
         "../db_interface/src/axolotl/SessionRecord.cpp",
         "../db_interface/src/axolotl/SignedPreKey.cpp"
       ],
-      "cflags": ["-Wall", "-std=c++17", "-rdynamic", "-stdlib=libc++"],
+      "cflags": ["-Wall", "-std=c++1z"],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
+      'cflags_cc': ["-std=c++1z"],
       "include_dirs" : [
         "/usr/local/include",
         "/usr/include"
       ],
       "libraries": [
         "-pthread",
-        "-dl",
-        "/usr/local/Cellar/openssl/1.0.2r/lib/libssl.a",
-        "/usr/local/Cellar/openssl/1.0.2r/lib/libcrypto.a",
-        "/usr/local/Cellar/sqlite/3.28.0/lib/libsqlite3.a",
-        "/usr/local/lib/libSQLiteCpp.a",
+        "-ldl",
+        "/usr/lib/x86_64-linux-gnu/libssl.a",
+        "/usr/lib/x86_64-linux-gnu/libcrypto.a",
+        "/usr/lib/x86_64-linux-gnu/libsqlite3.a",
         "/usr/local/lib/libsignal-protocol-c.a",
-        "/usr/local/lib/libcivetweb.a",
+        "/usr/lib/libcivetweb.so",
         "/usr/local/lib/libcjson.a",
         "/usr/local/lib/spdlog/libspdlog.a"
-      ],
-      'conditions': [
-        ['OS=="mac"', {
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS' : [ '-std=c++17', '-stdlib=libc++' ],
-            'OTHER_LDFLAGS': [ '-stdlib=libc++' ],
-            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
-          }
-        }]
       ]
     }
   ]

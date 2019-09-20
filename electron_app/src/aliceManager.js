@@ -3,6 +3,7 @@ const path = require('path');
 const { app } = require('electron');
 const dbManager = require('./DBManager');
 const portscanner = require('portscanner');
+const http = require('http');
 
 const getLogsPath = node_env => {
   switch (node_env) {
@@ -86,19 +87,70 @@ const closeAlice = () => {
 };
 
 const restartAlice = async () => {
-  if (alice) {
+  console.log('Restarting ALice');
+  const isReachable = await checkReachability()
+  if (isReachable) {
     return;
   }
-  if (aliceStartTimeout) {
-    clearTimeout(aliceStartTimeout);
-    aliceStartTimeout = null;
-  }
+  closeAlice();
   await startAlice();
+  await checkReachability();
 };
+
+const isReachable = async () => {
+  const options = {
+    hostname: 'localhost',
+    port,
+    path: '/ping',
+    method: 'GET',
+    timeout: 500
+  }
+
+  return new Promise( (resolve) => {
+    const req = http.request(options, res => {
+      console.log(`statusCode: ${res.statusCode}`)
+    
+      res.on('data', body => {
+        console.log(body.toString());
+        resolve(body.toString().trim() === 'pong');
+      })
+    })
+    
+    req.on('error', error => {
+      console.log(error)
+      resolve(false)
+    })
+    
+    req.end()
+  })
+}
+
+const sleep = async (time) => {
+  return new Promise( (resolve) => {
+    setTimeout( () => {
+      resolve();
+    }, time)
+  })
+}
+
+const checkReachability = async () => {
+  let retries = 3;
+  while (retries > 0) {
+    const reachable = await isReachable();
+    if (reachable) {
+      return true;
+    }
+    retries--;
+    await sleep(500);
+  }
+  return false
+}
 
 module.exports = {
   startAlice,
   restartAlice,
   closeAlice,
-  getPort
+  getPort,
+  checkReachability,
+  isReachable
 };

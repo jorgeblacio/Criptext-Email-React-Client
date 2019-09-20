@@ -32,7 +32,7 @@ printf "  - Checking latest repos \n";
 # ================================================
 
 printf "  - Installing build dependencies \n";
-INSTALL_DEPS_ERROR=$( { sudo apt-get install libssl1.0-dev gcc cmake git pkg-config -y > /dev/null; } 2>&1 )
+INSTALL_DEPS_ERROR=$( { sudo apt-get install libssl-dev gcc cmake git pkg-config -y > /dev/null; } 2>&1 )
 if [ $? -ne 0 ]; then
   PEM "      Failed to install deps"
   echo "Reason: "; PEM $INSTALL_DEPS_ERROR;

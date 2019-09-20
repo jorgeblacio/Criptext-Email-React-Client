@@ -40,8 +40,6 @@ int preKeysCreate(struct mg_connection *conn, void *cbdata){
 }
 
 int pong(struct mg_connection *conn, void *cbdata){
-  std::cout.flush();
-  std::cout << "PING" << std::endl;
   mg_send_http_ok( conn, "text/plain", 5);
   mg_write(conn, "pong\n", 5);
   return 1;

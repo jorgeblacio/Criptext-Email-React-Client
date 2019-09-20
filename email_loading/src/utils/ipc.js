@@ -22,6 +22,10 @@ export const getSystemLanguage = async () => {
   return await callMain('get-system-language');
 };
 
+export const restartAlice = async () => {
+  return await callMain('restart-alice');
+};
+
 /* Criptext Client
 ----------------------------- */
 export const acknowledgeEvents = async eventIds => {

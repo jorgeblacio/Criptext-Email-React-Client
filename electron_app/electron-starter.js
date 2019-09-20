@@ -8,7 +8,7 @@ const loginWindow = require('./src/windows/login');
 const mailboxWindow = require('./src/windows/mailbox');
 const loadingWindow = require('./src/windows/loading');
 const composerWindowManager = require('./src/windows/composer');
-const { startAlice, closeAlice } = require('./src/aliceManager');
+const { startAlice, closeAlice, checkReachability } = require('./src/aliceManager');
 const { createAppMenu } = require('./src/windows/menu');
 const {
   showWindows, 
@@ -41,6 +41,10 @@ async function initApp() {
   }
 
   await startAlice();
+  console.log(Date.now());
+  const isReachable = await checkReachability();
+  console.log('is Reachable? ', isReachable);
+  console.log(Date.now());
 
   const [existingAccount] = await dbManager.getAccount();
   if (existingAccount) {

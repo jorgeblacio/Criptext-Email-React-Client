@@ -12,7 +12,6 @@ CriptextDB::IdentityKey CriptextDB::getIdentityKey(string dbPath, string recipie
   database db(dbPath, config);
 
   IdentityKey identityKey;
-  std::cout << 1 << std::endl;
   db << "Select * from identitykeyrecord where recipientId == ? and deviceId == ?;"
      << recipientId
      << deviceId
@@ -25,16 +24,13 @@ CriptextDB::IdentityKey CriptextDB::getIdentityKey(string dbPath, string recipie
     };
 
   if (identityKey.deviceId == 0) {
-    std::cout << 2 << std::endl;
     throw std::invalid_argument("row not available");
   }
-  std::cout << 3 << std::endl;
   return identityKey;
 }
 
 bool CriptextDB::createIdentityKey(string dbPath, string recipientId, int deviceId, char *identityKey) {
   try {
-    std::cout << 4 << std::endl;
     bool hasRow;
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
@@ -46,7 +42,6 @@ bool CriptextDB::createIdentityKey(string dbPath, string recipientId, int device
      >> [&] (string recipientId, int deviceId, string identity) {
         hasRow = true;
     };
-    std::cout << 5 << " : " << hasRow << std::endl;
     if (hasRow) {
       db << "update identitykeyrecord set identityKey = ? where recipientId == ? and deviceId == ?;"
         << identityKey
@@ -59,7 +54,6 @@ bool CriptextDB::createIdentityKey(string dbPath, string recipientId, int device
         << identityKey;
     }
     db << "commit;";
-    std::cout << 6 << std::endl;
   } catch (exception& e) {
     std::cout << "ERROR : " << e.what() << std::endl;
     return false;

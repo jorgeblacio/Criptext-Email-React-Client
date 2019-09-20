@@ -105,6 +105,25 @@ export const fetchDecryptBody = async ({
   return await fetch(requestUrl, options);
 };
 
+export const fetchDecryptKey = async ({
+  deviceId,
+  recipientId,
+  messageType,
+  key
+}) => {
+  const requestUrl = `${aliceUrl}:${getAlicePort()}/decrypt/key`;
+  const options = {
+    method: 'POST',
+    body: JSON.stringify({
+      deviceId,
+      recipientId,
+      messageType,
+      key
+    })
+  };
+  return await fetch(requestUrl, options);
+};
+
 export const createAccountCredentials = async ({
   recipientId,
   deviceId,

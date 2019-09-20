@@ -36,6 +36,10 @@ export const throwError = error => {
   callMain('throwError', error);
 };
 
+export const restartAlice = async () => {
+  return await callMain('restart-alice');
+};
+
 /* Criptext Client
 ----------------------------- */
 export const checkExpiredSession = async params => {

@@ -2,7 +2,8 @@
 import {
   findKeyBundles,
   getSessionRecordByRecipientIds,
-  postEmail
+  postEmail,
+  restartAlice
 } from './../utils/ipc';
 import SignalProtocolStore from './store';
 import { CustomError } from './../utils/CustomError';
@@ -91,10 +92,12 @@ const createEmails = async (
   });
   while (myKeyBundles.length > 0) {
     const keyBundlesBatch = myKeyBundles.splice(0, 30);
-    await createSession({
-      accountRecipientId: myAccount.recipientId,
-      keybundles: keyBundlesBatch
-    });
+    await aliceRequestWrapper( () => {
+      return createSession({
+        accountRecipientId: myAccount.recipientId,
+        keybundles: keyBundlesBatch
+      });
+    })
   }
 
   const criptextEmailsByRecipientId = {};
@@ -139,13 +142,15 @@ const createEmails = async (
               return [...result, `${file.key}:${file.iv}`];
             }, [])
           : null;
-        const res = await encryptEmail({
-          accountRecipientId: myAccount.recipientId,
-          body,
-          preview,
-          fileKeys,
-          recipientId,
-          deviceId
+        const res = await aliceRequestWrapper( () => {
+          return encryptEmail({
+            accountRecipientId: myAccount.recipientId,
+            body,
+            preview,
+            fileKeys,
+            recipientId,
+            deviceId
+          });
         });
         const {
           bodyEncrypted,
@@ -428,5 +433,21 @@ const encryptExternalEmail = async ({
     encryptedBody: encryptedBody.body
   };
 };
+
+const aliceRequestWrapper = async (func) => {
+  let retries = 3;
+  let res;
+  while (retries >= 0) {
+    retries -= 1;
+    try {
+      res = await func();
+      if (res.status === 200) break;
+    } catch (ex) {
+      if (ex.toString() !== 'TypeError: Failed to fetch') break;
+      await restartAlice();
+    }
+  }
+  return res;
+}
 
 export { encryptPostEmail, createDummyKeyBundle };

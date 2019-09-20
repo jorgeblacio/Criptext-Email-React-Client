@@ -53,7 +53,6 @@ int CriptextSignal::decryptText(uint8_t **plaintext_data, size_t *plaintext_len,
 
     session_cipher *session_cipher = 0;
     result = session_cipher_create(&session_cipher, store, &address, global_context);
-    std::cout << "Message Type : " << message_type <<  std::endl;
     size_t decode_len = 0;
     const unsigned char *encryptedCText = reinterpret_cast<const unsigned char*>(encryptedText.c_str());
     unsigned char* textFromB64 = base64_decode(encryptedCText, strlen((char *)encryptedCText), &decode_len);
@@ -78,8 +77,6 @@ int CriptextSignal::decryptText(uint8_t **plaintext_data, size_t *plaintext_len,
         }
         uint8_t *data = signal_buffer_data(plainMessage);
         size_t len = signal_buffer_len(plainMessage);
-
-        std::cout << "Message :  " << data << " - size: " << len << std::endl;
 
         *plaintext_data = data;
         *plaintext_len = len;
@@ -277,8 +274,6 @@ int CriptextSignal::encryptText(char **encryptedText, uint8_t *plainText, size_t
         signal_buffer *outgoing_serialized = ciphertext_message_get_serialized(encryptedMessage);
         const unsigned char *text = reinterpret_cast<const unsigned char *>(signal_buffer_data(outgoing_serialized));
         char *encodedText = reinterpret_cast<char *>(base64_encode(text, signal_buffer_len(outgoing_serialized), &len));
-
-        std::cout << "ENCRYPTED : " << plainText << std::endl << "TO : " << encodedText << std::endl << "TYPE: " << messageType << std::endl;
 
         session_cipher_free(session_cipher);
         SIGNAL_UNREF(encryptedMessage);
