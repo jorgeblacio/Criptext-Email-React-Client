@@ -19,7 +19,7 @@ void PrintStackTrace()
          std::cout << strings[i] << std::endl;
       }
       spdlog::critical("--End Stack trace\n");
-      //free(strings);
+      free(strings);
    }
    else spdlog::critical("PrintStackTrace:  Error, could not generate stack trace!\n");
 }

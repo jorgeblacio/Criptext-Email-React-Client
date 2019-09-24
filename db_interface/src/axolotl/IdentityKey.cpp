@@ -36,7 +36,7 @@ bool CriptextDB::createIdentityKey(string dbPath, string recipientId, int device
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
 
     database db(dbPath, config);
-    //db << "begin;";
+    db << "begin;";
     db << "Select * from identitykeyrecord where recipientId == ? and deviceId == ?;"
      << recipientId
      << deviceId
@@ -54,9 +54,9 @@ bool CriptextDB::createIdentityKey(string dbPath, string recipientId, int device
         << deviceId
         << identityKey;
     }
-    //db << "commit;";
+    db << "commit;";
   } catch (exception& e) {
-    std::cout << "ERROR : " << e.what() << std::endl;
+    std::cout << "ERROR Creating Identity Key: " << e.what() << std::endl;
     return false;
   }
   return true;

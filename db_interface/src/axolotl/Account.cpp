@@ -35,7 +35,7 @@ int CriptextDB::createAccount(string dbPath, char* recipientId, char* name, int 
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
     database db(dbPath, config);
-    //db << "begin;";
+    db << "begin;";
     db << "Select recipientId from account where recipientId == ?;"
      << recipientId
      >> [&] (string recipientId) {
@@ -62,10 +62,9 @@ int CriptextDB::createAccount(string dbPath, char* recipientId, char* name, int 
         << pubKey
         << registrationId;
     }
-    //db << "commit;";
-    std::cout << "CREATING ACCOUNT" << std::endl;
+    db << "commit;";
   } catch (exception& e) {
-    std::cout << "ERROR : " << e.what() << std::endl;
+    std::cout << "ERROR Creating Account : " << e.what() << std::endl;
     return false;
   }
   return true;

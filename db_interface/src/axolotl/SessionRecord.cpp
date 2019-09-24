@@ -4,29 +4,23 @@ using namespace sqlite;
 using namespace std;
 
 CriptextDB::SessionRecord CriptextDB::getSessionRecord(string dbPath, string recipientId, long int deviceId) {
-  std::cout << "14.0.0" << std::endl;
   sqlite_config config;
   config.flags = OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
-  std::cout << "14.0" << " : " << recipientId << " : " << deviceId << std::endl;
   database db(dbPath, config);
   
-  std::cout << 14 << " : " << recipientId << " : " << deviceId << std::endl;
-  char *myRecord;
+  string myRecord;
   int myLen = 0;
   db << "Select * from sessionrecord where recipientId == ? and deviceId == ?;"
      << recipientId
      << deviceId
      >> [&] (string recipientId, int deviceId, string record, int recordLength) {
-        std::cout << 14.5 << " : " << record << std::endl;
+        std::cout << "GONNA COPY!!" << std::endl;
         myLen = recordLength;
-        myRecord = (char *)malloc(recordLength);
-        strcpy(myRecord, record.c_str());
+        myRecord = record;
     };
   if (myLen == 0) {
-    std::cout << 15 << std::endl;
     throw std::invalid_argument("row not available");
   }
-  std::cout << 15.1 << " : " << myRecord << std::endl;
   SessionRecord sessionRecord = { 
     .recipientId = recipientId, 
     .deviceId = deviceId, 
@@ -34,13 +28,12 @@ CriptextDB::SessionRecord CriptextDB::getSessionRecord(string dbPath, string rec
     .len = (size_t)myLen 
   };
 
-  std::cout << 16 << " : " << sessionRecord.record << std::endl;
   return sessionRecord;
 }
 
 vector<CriptextDB::SessionRecord> CriptextDB::getSessionRecords(string dbPath, string recipientId) {
   vector<CriptextDB::SessionRecord> sessionRecords;
-  std::cout << 17 << std::endl;
+
   try {
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
@@ -57,7 +50,6 @@ vector<CriptextDB::SessionRecord> CriptextDB::getSessionRecords(string dbPath, s
         };
         sessionRecords.push_back(mySessionRecord);
     };
-    std::cout << 18 << std::endl;
   } catch (exception& e) {
     std::cout << e.what() << std::endl; 
     return sessionRecords;
@@ -68,22 +60,18 @@ vector<CriptextDB::SessionRecord> CriptextDB::getSessionRecords(string dbPath, s
 
 bool CriptextDB::createSessionRecord(string dbPath, string recipientId, long int deviceId, char* record, size_t len) {
   try {
-    std::cout << 19 << std::endl;
     bool hasRow = false;
               
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
-    std::cout << 19.3 << " : " << dbPath << std::endl;
     database db(dbPath, config);
-    std::cout << 19.5 << std::endl;
-    //db << "begin;";
+    db << "begin;";
     db << "Select * from sessionrecord where recipientId == ? and deviceId == ?;"
      << recipientId
      << deviceId
      >> [&] (string recipientId, int deviceId, string record, int recordLength) {
         hasRow = true;
     };
-    std::cout << 20 << " : " << record << std::endl;
     if (hasRow) {
       db << "update sessionrecord set record = ?, recordLength = ? where recipientId == ? and deviceId == ?;"
         << record
@@ -97,10 +85,9 @@ bool CriptextDB::createSessionRecord(string dbPath, string recipientId, long int
         << record
         << static_cast<int>(len);
     }
-    //db << "commit;";
-    std::cout << 21 << std::endl;
+    db << "commit;";
   } catch (exception& e) {
-    std::cout << "ERROR : " << e.what() << std::endl;
+    std::cout << "ERROR CREATING SESSION: " << e.what() << std::endl;
     return false;
   }
   return true;
@@ -108,7 +95,6 @@ bool CriptextDB::createSessionRecord(string dbPath, string recipientId, long int
 
 bool CriptextDB::deleteSessionRecord(string dbPath, string recipientId, long int deviceId) {
   try {
-    std::cout << 22 << std::endl;
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
     database db(dbPath, config);
@@ -116,16 +102,14 @@ bool CriptextDB::deleteSessionRecord(string dbPath, string recipientId, long int
      << recipientId
      << deviceId;
   } catch (exception& e) {
-    std::cout << "ERROR : " << e.what() << std::endl;
+    std::cout << "Error deleting session : " << e.what() << std::endl;
     return false;
   }
-  std::cout << 23 << std::endl;
   return true;
 }
 
 bool CriptextDB::deleteSessionRecords(string dbPath, string recipientId) {
   try {
-    std::cout << 24 << std::endl;
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
     database db(dbPath, config);
@@ -133,9 +117,8 @@ bool CriptextDB::deleteSessionRecords(string dbPath, string recipientId) {
     db << "delete from sessionrecord where recipientId == ?;"
      << recipientId;
   } catch (exception& e) {
-    std::cout << "ERROR : " << e.what() << std::endl;
+    std::cout << "Error deleting sessions : " << e.what() << std::endl;
     return false;
   }
-  std::cout << 25 << std::endl;
   return true;
 }

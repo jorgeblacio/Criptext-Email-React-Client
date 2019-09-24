@@ -166,11 +166,9 @@ int CriptextSignal::generateKeyBundle(cJSON *bundle, string recipientId, int dev
     ec_private_key *identityPrivateKey = 0;
 
     size_t privLen = 0;
-    std::cout << "HOLA 1" << std::endl;
     unsigned char *identityKeyPriv = reinterpret_cast<unsigned char *>(account.privKey);
-    std::cout << "HOLA 2" << std::endl;
     uint8_t *myPrivRecord = reinterpret_cast<uint8_t *>(base64_decode(identityKeyPriv, strlen(account.privKey), &privLen));    
-    std::cout << "HOLA 3" << std::endl;
+
     result = curve_decode_private_point(&identityPrivateKey, myPrivRecord, privLen, 0);
     char *signedPublicPreKeyEncoded = 0;
     char *signatureEncoded = 0;
@@ -272,7 +270,7 @@ int CriptextSignal::encryptText(char **encryptedText, uint8_t *plainText, size_t
         result = session_cipher_encrypt(session_cipher, plainText, plainTextLength, &encryptedMessage);
                 
         if (result < 0) {
-            std::cout << "ERROR ENCRYPT : " << result << std::endl;
+            std::cout << "Unable to encrypt : " << result << std::endl;
             return -1;
         }
 
@@ -289,7 +287,7 @@ int CriptextSignal::encryptText(char **encryptedText, uint8_t *plainText, size_t
         *encryptedText = encodedText;
         return messageType;
     } catch (exception &e) {
-        std::cout << "ERROR ENCRYPTING : " << e.what() << std::endl;
+        std::cout << "Error Encrypting : " << e.what() << std::endl;
         return -1;
     }
 

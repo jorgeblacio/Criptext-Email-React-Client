@@ -78,8 +78,8 @@ int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
   }
   std::cout << "/encrypt/email Receiving Request" << std::endl;
   spdlog::info("[{0}] /encrypt/email Receiving Request", endpointId);
-  char *bufferData;
-  int readLength = parseBody(&bufferData, conn);
+  string bufferData = parseBody(conn);
+  int readLength = bufferData.length();
 
   if (readLength <= 0) {
     spdlog::error("[{0}] Request data too big", endpointId);
@@ -87,7 +87,7 @@ int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
     return 400;
   }
   
-  cJSON *obj = cJSON_Parse(bufferData);
+  cJSON *obj = cJSON_Parse(bufferData.c_str());
   
   if (obj == NULL) {
     spdlog::error("[{0}] Not a json object: {1}", endpointId, bufferData);
@@ -123,7 +123,7 @@ int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
       int type = signal.encryptText(&encryptedBody, text, len, recipientId->valuestring, deviceId->valueint);
       cJSON_AddStringToObject(response, "bodyEncrypted", encryptedBody);
       cJSON_AddNumberToObject(response, "bodyMessageType", type);
-      //free(text);
+      free(text);
     } catch (exception &ex) {
       spdlog::error("[{0}] ENCRYPT BODY ERROR {1}", endpointId, ex.what());
       mg_send_http_error(conn, 500, "%s", "Unable to encrypt body");
@@ -140,7 +140,7 @@ int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
       int type = signal.encryptText(&encryptedPreview, text, len, recipientId->valuestring, deviceId->valueint);
       cJSON_AddStringToObject(response, "previewEncrypted", encryptedPreview);
       cJSON_AddNumberToObject(response, "previewMessageType", type);
-      //free(text);
+      free(text);
     } catch (exception &ex) {
       spdlog::error("[{0}] ENCRYPT PREVIEW ERROR {1}", endpointId, ex.what());
       mg_send_http_error(conn, 500, "%s", "Unable to encrypt body");
@@ -163,7 +163,7 @@ int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
 
         cJSON *decryptedFileKey = cJSON_CreateString(encryptedFileKey);
         cJSON_AddItemToArray(myFileKeys, decryptedFileKey);
-        //free(text);
+        free(text);
       } catch (exception &ex) {
         spdlog::error("[{0}] ENCRYPT FILEKEYS ERROR {1}", endpointId, ex.what());
         mg_send_http_error(conn, 500, "%s", "Unable to encrypt body");

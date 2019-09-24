@@ -15,7 +15,7 @@ namespace CriptextDB {
   struct SessionRecord {
     string recipientId;
     long int deviceId;
-    char *record;
+    string record;
     size_t len;
   };
 
