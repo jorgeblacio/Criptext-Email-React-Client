@@ -4,8 +4,10 @@ using namespace sqlite;
 using namespace std;
 
 CriptextDB::SessionRecord CriptextDB::getSessionRecord(string dbPath, string recipientId, long int deviceId) {
+  std::cout << "14.0.0" << std::endl;
   sqlite_config config;
-  config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
+  config.flags = OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
+  std::cout << "14.0" << " : " << recipientId << " : " << deviceId << std::endl;
   database db(dbPath, config);
   
   std::cout << 14 << " : " << recipientId << " : " << deviceId << std::endl;
@@ -67,20 +69,21 @@ vector<CriptextDB::SessionRecord> CriptextDB::getSessionRecords(string dbPath, s
 bool CriptextDB::createSessionRecord(string dbPath, string recipientId, long int deviceId, char* record, size_t len) {
   try {
     std::cout << 19 << std::endl;
-    bool hasRow;
+    bool hasRow = false;
               
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
+    std::cout << 19.3 << " : " << dbPath << std::endl;
     database db(dbPath, config);
-
-    db << "begin;";
+    std::cout << 19.5 << std::endl;
+    //db << "begin;";
     db << "Select * from sessionrecord where recipientId == ? and deviceId == ?;"
      << recipientId
      << deviceId
      >> [&] (string recipientId, int deviceId, string record, int recordLength) {
         hasRow = true;
     };
-    std::cout << 20 << std::endl;
+    std::cout << 20 << " : " << record << std::endl;
     if (hasRow) {
       db << "update sessionrecord set record = ?, recordLength = ? where recipientId == ? and deviceId == ?;"
         << record
@@ -94,7 +97,7 @@ bool CriptextDB::createSessionRecord(string dbPath, string recipientId, long int
         << record
         << static_cast<int>(len);
     }
-    db << "commit;";
+    //db << "commit;";
     std::cout << 21 << std::endl;
   } catch (exception& e) {
     std::cout << "ERROR : " << e.what() << std::endl;

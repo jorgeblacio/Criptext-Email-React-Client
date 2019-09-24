@@ -8,6 +8,7 @@
 
 int session_store_load_session(signal_buffer **record, signal_buffer **user_record, const signal_protocol_address *address, void *user_data)
 {
+    std::cout << "Z : " << std::endl;
     CriptextDB::Account *account = (CriptextDB::Account*)user_data;
     string dbPath(account->dbPath);
 
@@ -15,14 +16,18 @@ int session_store_load_session(signal_buffer **record, signal_buffer **user_reco
     int deviceId = address->device_id;
     CriptextDB::SessionRecord sessionRecord;
     try {
+        std::cout << "A : " << dbPath << " : " << recipientId << " : " << deviceId << std::endl;
         sessionRecord = CriptextDB::getSessionRecord(dbPath, recipientId, deviceId);
+        std::cout << "A" << std::endl;
     } catch (exception& e) {
         std::cout << "ERRORs : " << e.what() << std::endl;
         return 0;
     }
     size_t len = 0;
     unsigned char *recordBase64 = reinterpret_cast<unsigned char *>(sessionRecord.record);
-    uint8_t *myRecord = reinterpret_cast<uint8_t *>(base64_decode(recordBase64, sessionRecord.len, &len));    
+    std::cout << "B" << std::endl;
+    uint8_t *myRecord = reinterpret_cast<uint8_t *>(base64_decode(recordBase64, sessionRecord.len, &len));
+    std::cout << "C" << std::endl;    
     signal_buffer *buffer = signal_buffer_create(myRecord, len);
 
     *record = buffer;

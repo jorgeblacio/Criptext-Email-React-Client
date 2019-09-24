@@ -98,8 +98,8 @@ int processKeyBundle(struct mg_connection *conn, void *cbdata, char *dbPath) {
 
   std::cout << "/session/create Receiving Request" << std::endl;
 
-  char *bufferData;
-  int readLength = parseBody(&bufferData, conn);
+  string bufferData = parseBody(conn);
+  int readLength = bufferData.length();
 
   if (readLength <= 0) {
     std::cout << "Receiving Request Fail 1" << std::endl;
@@ -107,7 +107,7 @@ int processKeyBundle(struct mg_connection *conn, void *cbdata, char *dbPath) {
     return 400;
   }
   
-  cJSON *obj = cJSON_Parse(bufferData);
+  cJSON *obj = cJSON_Parse(bufferData.c_str());
   
   if (obj == NULL) {
     mg_send_http_error(conn, 400, "%s", "Not a JSON String");
@@ -128,7 +128,9 @@ int processKeyBundle(struct mg_connection *conn, void *cbdata, char *dbPath) {
   cJSON *keyBundleObj = NULL;
   cJSON_ArrayForEach(keyBundleObj, keybundleArray) {
 
-    cJSON *recipientId, *domain, *deviceId, *registrationId, *signedPreKeyId, *signedPreKey, *signature, *identityKey, *preKeyObj, *preKeyId, *preKey;
+    cJSON *recipientId, *domain, *deviceId, *registrationId, *signedPreKeyId, *signedPreKey, *signature, *identityKey, *preKeyObj; 
+    cJSON *preKeyId = 0; 
+    cJSON *preKey = 0;
 
     recipientId = cJSON_GetObjectItemCaseSensitive(keyBundleObj, "recipientId");
     deviceId = cJSON_GetObjectItemCaseSensitive(keyBundleObj, "deviceId");

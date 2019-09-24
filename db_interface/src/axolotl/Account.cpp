@@ -31,11 +31,11 @@ CriptextDB::Account CriptextDB::getAccount(string dbPath, char *recipientId) {
 
 int CriptextDB::createAccount(string dbPath, char* recipientId, char* name, int deviceId, char* pubKey, char* privKey, int registrationId) {
   try {
-    bool hasRow;
+    bool hasRow = false;
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
     database db(dbPath, config);
-    db << "begin;";
+    //db << "begin;";
     db << "Select recipientId from account where recipientId == ?;"
      << recipientId
      >> [&] (string recipientId) {
@@ -51,6 +51,7 @@ int CriptextDB::createAccount(string dbPath, char* recipientId, char* name, int 
         << registrationId
         << recipientId;
     } else {
+      std::cout << dbPath << std::endl;
       db << "insert into account (recipientId, name, deviceId, jwt, refreshToken, privKey, pubKey, registrationId) values (?,?,?,?,?,?,?,?);"
         << recipientId
         << name
@@ -61,7 +62,8 @@ int CriptextDB::createAccount(string dbPath, char* recipientId, char* name, int 
         << pubKey
         << registrationId;
     }
-    db << "commit;";
+    //db << "commit;";
+    std::cout << "CREATING ACCOUNT" << std::endl;
   } catch (exception& e) {
     std::cout << "ERROR : " << e.what() << std::endl;
     return false;

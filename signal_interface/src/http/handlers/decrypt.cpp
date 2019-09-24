@@ -9,8 +9,8 @@ int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
   }
   
   spdlog::info("[{0}] /decrypt Receiving Request", endpointId);
-  char *bufferData;
-  int readLength = parseBody(&bufferData, conn);
+  string bufferData = parseBody(conn);
+  int readLength = bufferData.length();
 
   if (readLength <= 0) {
     spdlog::error("[{0}] Request data too big", endpointId);
@@ -18,7 +18,7 @@ int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
     return 400;
   }
   
-  cJSON *obj = cJSON_Parse(bufferData);
+  cJSON *obj = cJSON_Parse(bufferData.c_str());
   
   if (obj == NULL) {
     spdlog::error("[{0}] Not a json object: {1}", endpointId, bufferData);
@@ -120,8 +120,8 @@ int postDecryptKey(struct mg_connection *conn, void *cbdata, char *dbPath) {
   
   spdlog::info("[{0}] /decrypt/key Receiving Request", endpointId);
 
-  char *bufferData;
-  int readLength = parseBody(&bufferData, conn);
+  string bufferData = parseBody(conn);
+  int readLength = bufferData.length();
 
   if (readLength <= 0) {
     spdlog::error("[{0}] Request data too big", endpointId);
@@ -129,7 +129,7 @@ int postDecryptKey(struct mg_connection *conn, void *cbdata, char *dbPath) {
     return 400;
   }
   
-  cJSON *obj = cJSON_Parse(bufferData);
+  cJSON *obj = cJSON_Parse(bufferData.c_str());
   
   if (obj == NULL) {
     spdlog::error("[{0}] Not a json object: {1}", endpointId, bufferData);

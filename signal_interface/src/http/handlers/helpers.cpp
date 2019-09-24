@@ -28,4 +28,20 @@ int parseBody(char **body, struct mg_connection *conn){
   *body = strdup(myBody);
   return readLength;
 }
+
+std::string parseBody(struct mg_connection* conn) {
+	int readLength = 0;
+	std::vector<char> myData;
+	while (true) {
+		char buffer[512];
+		int dlen = mg_read(conn, buffer, sizeof(buffer) - 1);
+		if (dlen <= 0) {
+			break;
+		}
+		myData.insert(myData.end(), buffer, buffer + dlen);
+		readLength += dlen;
+	}
+
+	return std::string(myData.begin(), myData.end());
+}
 	

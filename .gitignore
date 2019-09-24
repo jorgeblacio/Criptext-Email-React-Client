@@ -11,6 +11,7 @@ electron_app/src/__integrations__/**@criptext.com/
 
 #dev
 electron_app/userData/
+valgrind-out.txt
 
 # production
 *_interface/build

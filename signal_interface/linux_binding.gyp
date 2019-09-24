@@ -27,11 +27,12 @@
         "../db_interface/src/axolotl/SessionRecord.cpp",
         "../db_interface/src/axolotl/SignedPreKey.cpp"
       ],
-      "cflags": ["-Wall", "-std=c++11"],
+      "cflags": ["-Wall", "-std=c++17"],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
       "include_dirs" : [
-        "/usr/local/include"  # Include system libraries
+        "/usr/local/include",
+        "/home/criptext/Pedro/git/sqlite_modern_cpp/hdr"
       ],
       "libraries": [
         "-pthread",
@@ -39,18 +40,10 @@
         "/usr/lib/x86_64-linux-gnu/libssl.a",
         "/usr/lib/x86_64-linux-gnu/libcrypto.a",
         "/usr/lib/x86_64-linux-gnu/libsqlite3.a",
-        "/usr/local/lib/libSQLiteCpp.a",
         "/usr/local/lib/libsignal-protocol-c.a",
         "/usr/lib/libcivetweb.so",
         "/usr/local/lib/libcjson.a",
         "/usr/local/lib/spdlog/libspdlog.a"
-      ],
-      'conditions': [
-        ['OS=="mac"', {
-          'xcode_settings': {
-            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
-          }
-        }]
       ]
     }
   ]

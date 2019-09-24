@@ -40,7 +40,7 @@ async function initApp() {
     console.log(ex);
   }
 
-  await startAlice();
+  //await startAlice();
   console.log(Date.now());
   const isReachable = await checkReachability();
   console.log('is Reachable? ', isReachable);

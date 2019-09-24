@@ -31,11 +31,12 @@ CriptextDB::IdentityKey CriptextDB::getIdentityKey(string dbPath, string recipie
 
 bool CriptextDB::createIdentityKey(string dbPath, string recipientId, int deviceId, char *identityKey) {
   try {
-    bool hasRow;
+    bool hasRow = false;
     sqlite_config config;
     config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READWRITE;
+
     database db(dbPath, config);
-    db << "begin;";
+    //db << "begin;";
     db << "Select * from identitykeyrecord where recipientId == ? and deviceId == ?;"
      << recipientId
      << deviceId
@@ -53,7 +54,7 @@ bool CriptextDB::createIdentityKey(string dbPath, string recipientId, int device
         << deviceId
         << identityKey;
     }
-    db << "commit;";
+    //db << "commit;";
   } catch (exception& e) {
     std::cout << "ERROR : " << e.what() << std::endl;
     return false;

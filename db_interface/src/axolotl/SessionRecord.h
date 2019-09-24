@@ -1,8 +1,8 @@
 #ifndef SESSIONRECORD_H_
 #define SESSIONRECORD_H_
 
-#include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <stdexcept>
 #include <sqlite_modern_cpp.h>
