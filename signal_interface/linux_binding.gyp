@@ -31,8 +31,7 @@
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
       "include_dirs" : [
-        "/usr/local/include",
-        "/home/criptext/Pedro/git/sqlite_modern_cpp/hdr"
+        "/usr/local/include"
       ],
       "libraries": [
         "-pthread",
