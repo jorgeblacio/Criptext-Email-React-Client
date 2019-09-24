@@ -12,7 +12,7 @@ namespace CriptextDB {
 
   struct SignedPreKey { 
     int id;
-    char *record;
+    string record;
     int len;
   };
 

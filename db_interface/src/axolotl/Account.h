@@ -11,8 +11,8 @@ using namespace std;
 
 namespace CriptextDB {
   struct Account {
-    char* privKey;
-    char* pubKey;
+    string privKey;
+    string pubKey;
     int registrationId;
     char* dbPath;
   };

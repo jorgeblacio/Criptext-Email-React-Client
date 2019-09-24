@@ -12,7 +12,7 @@ namespace CriptextDB {
 
   struct PreKey { 
     int id;
-    char* record;
+    string record;
     size_t len;
   };
 

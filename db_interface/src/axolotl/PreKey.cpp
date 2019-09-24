@@ -8,17 +8,16 @@ CriptextDB::PreKey CriptextDB::getPreKey(string dbPath, short int id) {
   config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
   database db(dbPath, config);
 
-  char *myPreKey;
-  size_t myLen;
+  string myPreKey;
+  size_t myLen = 0;
   db << "Select * from prekeyrecord where preKeyId == ?;"
      << id
      >> [&] (int preKeyId, string record, int recordLength) {
-        myPreKey = (char *)malloc(record.length());
-        strcpy(myPreKey, record.c_str());
+        myPreKey = record;
         myLen = (size_t)recordLength;
     };
 
-  if (!myPreKey) {
+  if (myLen == 0) {
     throw std::invalid_argument("row not available");
   }
   PreKey preKey = { 

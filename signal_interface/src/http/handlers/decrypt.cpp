@@ -53,11 +53,8 @@ int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
       uint8_t *plaintext_data = 0;
       size_t plaintext_len = 0;
       int result = signal.decryptText(&plaintext_data, &plaintext_len, body->valuestring, senderId->valuestring, deviceId->valueint, type->valueint);
-      char *text = (char *)malloc(plaintext_len);
-      memcpy(text, plaintext_data, plaintext_len);
-      text[plaintext_len] = '\0';
-      cJSON_AddStringToObject(response, "decryptedBody", text);
-      free(text);
+      string text = std::string(plaintext_data, plaintext_data + plaintext_len);
+      cJSON_AddStringToObject(response, "decryptedBody", text.c_str());
     } catch (exception &ex) {
       spdlog::error("[{0}] DECRYPT BODY ERROR {1}", endpointId, ex.what());
       mg_send_http_error(conn, 500, "%s", "Unable to encrypt body");
@@ -70,11 +67,8 @@ int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
       uint8_t *plaintext_data = 0;
       size_t plaintext_len = 0;
       int result = signal.decryptText(&plaintext_data, &plaintext_len, headers->valuestring, senderId->valuestring, deviceId->valueint, headersType->valueint);
-      char *text = (char *)malloc(plaintext_len);
-      memcpy(text, plaintext_data, plaintext_len);
-      text[plaintext_len] = '\0';
-      cJSON_AddStringToObject(response, "decryptedHeaders", text);
-      free(text);
+      string text = std::string(plaintext_data, plaintext_data + plaintext_len);
+      cJSON_AddStringToObject(response, "decryptedHeaders", text.c_str());
     } catch (exception &ex) {
       spdlog::error("[{0}] DECRYPT HEADER ERROR {1}", endpointId, ex.what());
       mg_send_http_error(conn, 500, "%s", "Unable to encrypt body");
@@ -91,12 +85,9 @@ int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
         uint8_t *plaintext_data = 0;
         size_t plaintext_len = 0;
         int result = signal.decryptText(&plaintext_data, &plaintext_len, fileKey->valuestring, senderId->valuestring, deviceId->valueint, type->valueint);
-        char *text = (char *)malloc(plaintext_len);
-        memcpy(text, plaintext_data, plaintext_len);
-        text[plaintext_len] = '\0';
-        cJSON *decryptedFileKey = cJSON_CreateString(text);
+        string text = std::string(plaintext_data, plaintext_data + plaintext_len);
+        cJSON *decryptedFileKey = cJSON_CreateString(text.c_str());
         cJSON_AddItemToArray(myFileKeys, decryptedFileKey);
-        free(text);
       } catch (exception &ex) {
         spdlog::error("[{0}] DECRYPT FILEKEY ERROR {1}", endpointId, ex.what());
         mg_send_http_error(conn, 500, "%s", "Unable to encrypt body");

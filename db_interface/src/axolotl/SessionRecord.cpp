@@ -5,7 +5,7 @@ using namespace std;
 
 CriptextDB::SessionRecord CriptextDB::getSessionRecord(string dbPath, string recipientId, long int deviceId) {
   sqlite_config config;
-  config.flags = OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
+  config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
   database db(dbPath, config);
   
   string myRecord;
@@ -14,7 +14,6 @@ CriptextDB::SessionRecord CriptextDB::getSessionRecord(string dbPath, string rec
      << recipientId
      << deviceId
      >> [&] (string recipientId, int deviceId, string record, int recordLength) {
-        std::cout << "GONNA COPY!!" << std::endl;
         myLen = recordLength;
         myRecord = record;
     };

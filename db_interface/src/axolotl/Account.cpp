@@ -9,16 +9,14 @@ CriptextDB::Account CriptextDB::getAccount(string dbPath, char *recipientId) {
   config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
   database db(dbPath, config);
   
-  char *myPrivKey;
-  char *myPubKey;
+  string myPrivKey;
+  string myPubKey;
   int regId = 0;
   db << "select privKey, pubKey, registrationId from account where recipientId == ?;"
     << recipientId
     >> [&] (string privKey, string pubKey, int registrationId) {
-      myPrivKey = (char *)malloc(privKey.length());
-      myPubKey = (char *)malloc(pubKey.length());
-      strcpy(myPrivKey, privKey.c_str());
-      strcpy(myPubKey, pubKey.c_str());
+      myPrivKey = privKey;
+      myPubKey = pubKey;
       regId = registrationId;
   };
   Account account = { 

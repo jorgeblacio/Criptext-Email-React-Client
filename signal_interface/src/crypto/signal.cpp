@@ -118,7 +118,7 @@ int CriptextSignal::generatePreKey(cJSON *preKeyJson, int index) {
     return 0;
 }
 
-int generateBundle(cJSON *bundle, int registrationId, char *signedPreKeySignature, char *signedPreKeyPublic, int signedPreKeyId, char *identityPublicKey, cJSON *preKeys) {
+int generateBundle(cJSON *bundle, int registrationId, char *signedPreKeySignature, char *signedPreKeyPublic, int signedPreKeyId, const char *identityPublicKey, cJSON *preKeys) {
 
     cJSON_AddStringToObject(bundle, "signedPreKeySignature", signedPreKeySignature);
     cJSON_AddStringToObject(bundle, "signedPreKeyPublic", signedPreKeyPublic);
@@ -166,8 +166,8 @@ int CriptextSignal::generateKeyBundle(cJSON *bundle, string recipientId, int dev
     ec_private_key *identityPrivateKey = 0;
 
     size_t privLen = 0;
-    unsigned char *identityKeyPriv = reinterpret_cast<unsigned char *>(account.privKey);
-    uint8_t *myPrivRecord = reinterpret_cast<uint8_t *>(base64_decode(identityKeyPriv, strlen(account.privKey), &privLen));    
+    const unsigned char *identityKeyPriv = reinterpret_cast<const unsigned char *>(account.privKey.c_str());
+    uint8_t *myPrivRecord = reinterpret_cast<uint8_t *>(base64_decode(identityKeyPriv, account.privKey.length(), &privLen));    
 
     result = curve_decode_private_point(&identityPrivateKey, myPrivRecord, privLen, 0);
     char *signedPublicPreKeyEncoded = 0;
@@ -179,8 +179,8 @@ int CriptextSignal::generateKeyBundle(cJSON *bundle, string recipientId, int dev
         generatePreKey(preKeyObject, index);
         cJSON_AddItemToArray(preKeysArray, preKeyObject);
     }
-    
-    generateBundle(bundle, account.registrationId, signatureEncoded, signedPublicPreKeyEncoded, 1, account.pubKey, preKeysArray);
+
+    generateBundle(bundle, account.registrationId, signatureEncoded, signedPublicPreKeyEncoded, 1, account.pubKey.c_str(), preKeysArray);
     return 0;
 }
 

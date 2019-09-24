@@ -13,17 +13,16 @@ CriptextDB::SignedPreKey CriptextDB::getSignedPreKey(string dbPath, short int id
   config.flags = OpenFlags::FULLMUTEX | OpenFlags::SHAREDCACHE | OpenFlags::READONLY;
   database db(dbPath, config);
 
-  char *mySignedPreKey;
-  int myLen;
+  string mySignedPreKey;
+  int myLen = 0;
   db << "Select * from signedprekeyrecord where signedPreKeyId == ?;"
      << id
      >> [&] (int preKeyId, string record, int recordLength) {
-        mySignedPreKey = (char *)malloc(record.length());
-        strcpy(mySignedPreKey, record.c_str());
+        mySignedPreKey = record;
         myLen = (size_t)recordLength;
         
     };
-  if (!mySignedPreKey) {
+  if (myLen == 0) {
     throw std::invalid_argument("row not available");
   }
   SignedPreKey signedPreKey = { 
