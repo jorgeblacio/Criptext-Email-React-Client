@@ -55,6 +55,7 @@ class MigrationPopupWrapper extends Component {
         onClickRestart={logoutApp}
         shouldRetry={this.state.shouldRetry}
         shouldRestart={this.state.shouldRestart}
+        showLoading={this.state.step !== MIGRATION_STATUS.SUCCEDED}
         {...this.props}
       />
     );
@@ -184,8 +185,8 @@ class MigrationPopupWrapper extends Component {
 
   handleRetryUpgrade = () => {
     this.setState({
-      shouldRetry: null,
-      shouldRestart: null
+      shouldRetry: false,
+      shouldRestart: false
     });
     const retryData = { ...this.state.retryData };
 

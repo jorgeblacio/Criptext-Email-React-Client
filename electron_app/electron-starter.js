@@ -41,10 +41,7 @@ async function initApp() {
   }
 
   await startAlice();
-  console.log(Date.now());
-  const isReachable = await checkReachability();
-  console.log('is Reachable? ', isReachable);
-  console.log(Date.now());
+  await checkReachability();
 
   const [existingAccount] = await dbManager.getAccount();
   if (existingAccount) {

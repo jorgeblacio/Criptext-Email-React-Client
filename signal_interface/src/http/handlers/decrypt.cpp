@@ -22,7 +22,7 @@ int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
   
   if (obj == NULL) {
     spdlog::error("[{0}] Not a json object: {1}", endpointId, bufferData);
-    mg_send_http_error(conn, 400, "%s", bufferData);
+    mg_send_http_error(conn, 400, "%s", bufferData.c_str());
     return 400;
   }
 
@@ -124,7 +124,7 @@ int postDecryptKey(struct mg_connection *conn, void *cbdata, char *dbPath) {
   
   if (obj == NULL) {
     spdlog::error("[{0}] Not a json object: {1}", endpointId, bufferData);
-    mg_send_http_error(conn, 400, "%s", bufferData);
+    mg_send_http_error(conn, 400, "%s", bufferData.c_str());
     return 400;
   }
   spdlog::info("[{0}] Request -> {1}", endpointId, bufferData);

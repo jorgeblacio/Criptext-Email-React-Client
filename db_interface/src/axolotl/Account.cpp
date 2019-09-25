@@ -49,7 +49,6 @@ int CriptextDB::createAccount(string dbPath, char* recipientId, char* name, int 
         << registrationId
         << recipientId;
     } else {
-      std::cout << dbPath << std::endl;
       db << "insert into account (recipientId, name, deviceId, jwt, refreshToken, privKey, pubKey, registrationId) values (?,?,?,?,?,?,?,?);"
         << recipientId
         << name

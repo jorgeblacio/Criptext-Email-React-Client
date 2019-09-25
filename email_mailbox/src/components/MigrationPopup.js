@@ -12,21 +12,27 @@ const MigrationPopup = props => {
         <h1>{title}</h1>
       </div>
       <div className="popup-paragraph">
-        <div className="loading-ring">
-          <div />
-          <div />
-          <div />
-          <div />
-        </div>
+        {props.showLoading ? (
+          <div className="loading-ring">
+            <div />
+            <div />
+            <div />
+            <div />
+          </div>
+        ) : null}
         <p>{props.error || props.paragraph}</p>
       </div>
       {props.shouldRestart ? (
         <div>
-          <button onClick={props.onClickRestart}>Restart</button>
+          <button className="retry-link" onClick={props.onClickRestart}>
+            Restart
+          </button>
         </div>
       ) : props.shouldRetry ? (
         <div>
-          <button onClick={props.onClickRetry}>Retry</button>
+          <button className="retry-link" onClick={props.onClickRetry}>
+            Retry
+          </button>
         </div>
       ) : null}
     </div>
@@ -38,6 +44,7 @@ MigrationPopup.propTypes = {
   error: PropTypes.string,
   shouldRestart: PropTypes.bool,
   shouldRetry: PropTypes.bool,
+  showLoading: PropTypes.bool,
   onClickRestart: PropTypes.func,
   onClickRetry: PropTypes.func
 };
