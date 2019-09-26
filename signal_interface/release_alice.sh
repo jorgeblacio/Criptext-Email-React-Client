@@ -18,13 +18,13 @@ CURRENT_OS=$( uname )
 if [ "$CURRENT_OS" = "Linux" ]; then
   printf "  - OS:    Linux \n"
   isSupported=1;
-  cp ./linux_binding.gyp ./binding.gyp
+  cp .installation/linux/linux_binding.gyp ./binding.gyp
 
 
 elif [ "$CURRENT_OS" = "Darwin" ]; then
   printf "  - OS:    MacOS \n\n";
   isSupported=1;
-  cp ./macos_binding.gyp ./binding.gyp
+  cp .installation/macos/macos_binding.gyp ./binding.gyp
 
 else
 	printf "  - OS:    Windows \n\n";

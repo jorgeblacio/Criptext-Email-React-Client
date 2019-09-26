@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import string from '../lang';
 import './migrationpopup.scss';
 
-const { title } = string.popups.migration;
+const { title, restartApp, retry } = string.popups.migration;
 
 const MigrationPopup = props => {
   return (
@@ -25,13 +25,13 @@ const MigrationPopup = props => {
       {props.shouldRestart ? (
         <div>
           <button className="retry-link" onClick={props.onClickRestart}>
-            Restart
+            {restartApp}
           </button>
         </div>
       ) : props.shouldRetry ? (
         <div>
           <button className="retry-link" onClick={props.onClickRetry}>
-            Retry
+            {retry}
           </button>
         </div>
       ) : null}

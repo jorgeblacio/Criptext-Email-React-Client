@@ -467,6 +467,8 @@
     },
     "migration": {
       "title": "Your app is being upgraded",
+      "restartApp": "Restart App",
+      "retry": "Retry",
       "paragraphs": {
         "step1": "Initializing data...",
         "step2": "Generating new session...",

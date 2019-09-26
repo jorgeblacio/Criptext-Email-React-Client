@@ -467,6 +467,8 @@
     },
     "migration": {
       "title": "Tu app se esta actualizando",
+      "restartApp": "Reiniciar Aplicación",
+      "retry": "Reintentar",
       "paragraphs": {
         "step1": "Inicializando datos...",
         "step2": "Generando una nueva sesión...",
