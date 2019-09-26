@@ -41,7 +41,6 @@
         "<libssl>",
         "<libcrypto>",
         "<libsqlite3>",
-        "<libSQLiteCpp>",
         "<libsignal-protocol-c>",
         "<libcivetweb>",
         "<libcjson>",

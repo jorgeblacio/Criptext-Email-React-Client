@@ -19,9 +19,6 @@ function removeTempFolder1() {
 function removeTempFolder2() {
   cd ../..; rm -rf "${tempBuildFolder}"; return;
 }
-function removeTempFolder3() {
-  cd ../../..; rm -rf "${tempBuildFolder}"; return;
-}
 
 # Temp folder
 printf "  - Preparing build... \n";
@@ -32,44 +29,7 @@ echo "-----------------------------------------"
  PSM "             DB Interface";
 echo "-----------------------------------------"
 
-# Download && build SQLite
-printf "  - Downloading SQLiteCpp... \n";
-git clone https://github.com/SRombauts/SQLiteCpp --quiet;
-if [ $? -ne 0 ]; then
-  PEM "    Failed to download SQLiteCpp";
-  removeTempFolder1;
-fi
-
-printf "  - Creating build directory... \n";
-cd ./SQLiteCpp > /dev/null;
-mkdir build && cd build > /dev/null;
-
-cmake -DSQLITECPP_INTERNAL_SQLITE=ON -DSQLITECPP_BUILD_EXAMPLES=OFF -DSQLITECPP_BUILD_TESTS=OFF .. > /dev/null;
-if [ $? -ne 0 ]; then
-  PEM "    Failed to make SQLiteCpp";
-  removeTempFolder3;
-fi
-
-# Ignore Warnings
-cmake --build . > /dev/null;
-if [ $? -ne 0 ]; then
-  PEM "    Failed to build SQLiteCpp";
-  removeTempFolder3;
-fi
-
-make install > /dev/null;
-if [ $? -ne 0 ]; then
-  PEM "    Failed to install SQLiteCpp";
-  removeTempFolder3;
-fi
-
-cd ../..
-
-echo "-----------------------------------------"
- PSM "             MODERN SQL Interface";
-echo "-----------------------------------------"
-
-# Download && build SQLite
+# Download && build sqlite_modern_cpp
 printf "  - Downloading sqlite_modern_cpp... \n";
 git clone https://github.com/SqliteModernCpp/sqlite_modern_cpp.git --quiet;
 if [ $? -ne 0 ]; then
