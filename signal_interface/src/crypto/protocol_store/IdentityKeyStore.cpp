@@ -52,11 +52,14 @@ int identity_key_store_is_trusted_identity(const signal_protocol_address *addres
     string recipientId = std::string(address->name);
     int deviceId = address->device_id;
 
-    string incomingIdentityKey = string(key_data, key_data + key_len);
+    size_t data_len = 0;
+    const unsigned char *identityKey = reinterpret_cast<const unsigned char *>(key_data);
+    char *incomingIdentity = reinterpret_cast<char *>(base64_encode(identityKey, key_len, &data_len));    
+    string incomingIdentityKey = string(incomingIdentity);
 
     try {
-        CriptextDB::IdentityKey identityKey = CriptextDB::getIdentityKey(dbPath, recipientId, deviceId);
-        return identityKey.identityKey == incomingIdentityKey;
+        CriptextDB::IdentityKey myIdentityKey = CriptextDB::getIdentityKey(dbPath, recipientId, deviceId);
+        return myIdentityKey.identityKey == incomingIdentityKey;
     } catch (exception& e){
         std::cout << "Error trusting key : " << e.what() << std::endl;
         return 1;
