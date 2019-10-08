@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "alice",
+      "target_name": "criptext-encryption-service",
       "type": "executable",
       "sources": [ 
         "main.cpp",

@@ -1,5 +1,4 @@
 #include "SignedPreKey.h"
-#include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
 #include <vector>
 #include <iostream>

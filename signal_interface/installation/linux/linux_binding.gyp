@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "alice",
+      "target_name": "criptext-encryption-service",
       "type": "executable",
       "sources": [ 
         "main.cpp",
@@ -27,11 +27,13 @@
         "../db_interface/src/axolotl/SessionRecord.cpp",
         "../db_interface/src/axolotl/SignedPreKey.cpp"
       ],
-      "cflags": ["-Wall", "-std=c++17"],
+      "cflags": ["-Wall", "-std=c++17", "-fno-strict-aliasing"],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
+      "cflags_cc": ["-std=c++17"],
       "include_dirs" : [
-        "/usr/local/include"
+        "/usr/local/include",
+        "/usr/include"
       ],
       "libraries": [
         "-pthread",
@@ -42,7 +44,7 @@
         "/usr/local/lib/libsignal-protocol-c.a",
         "/usr/lib/libcivetweb.so",
         "/usr/local/lib/libcjson.a",
-        "/usr/local/lib/spdlog/libspdlog.a"
+        "/usr/local/lib/libspdlog.a"
       ]
     }
   ]

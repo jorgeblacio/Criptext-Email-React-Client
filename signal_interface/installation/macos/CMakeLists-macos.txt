@@ -32,6 +32,11 @@ find_package(sqlite3 REQUIRED)
 
 add_executable(alice ${SOURCES})
 
+set_target_properties(alice PROPERTIES 
+    OUTPUT_NAME "criptext-encryption-service"
+    RUNTIME_OUTPUT_DIRECTORY "./Release"
+)
+
 target_link_libraries(alice OpenSSL::SSL)
 target_link_libraries(alice pthread)
 target_link_libraries(alice dl)

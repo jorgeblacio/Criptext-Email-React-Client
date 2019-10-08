@@ -4,6 +4,9 @@ const { app } = require('electron');
 const dbManager = require('./DBManager');
 const portscanner = require('portscanner');
 const http = require('http');
+const ps = require('ps-node');
+
+const ALICE_PROJECT_NAME = 'criptext-encryption-service';
 
 const getLogsPath = node_env => {
   switch (node_env) {
@@ -29,10 +32,10 @@ const getLogsPath = node_env => {
 const getAlicePath = nodeEnv => {
   switch (nodeEnv) {
     case 'development': {
-      return path.join(__dirname, '../../signal_interface/build/Release/alice');
+      return path.join(__dirname, `../../signal_interface/build/Release/${ALICE_PROJECT_NAME}`);
     }
     default: {
-      return path.join(path.dirname(__dirname), '../extraResources', 'alice');
+      return path.join(path.dirname(__dirname), '../extraResources', ALICE_PROJECT_NAME);
     }
   }
 };
@@ -54,6 +57,7 @@ const startAlice = async () => {
     const alicePath = getAlicePath(process.env.NODE_ENV);
     const dbpath = path.resolve(dbManager.databasePath);
     const logspath = path.resolve(getLogsPath(process.env.NODE_ENV));
+    await cleanAliceRemenants();
     alice = spawn(alicePath, [dbpath, myPort, logspath]);
     alice.stdout.on('data', data => {
       console.log(`-----alice-----\n${data}\n -----end-----`);
@@ -145,6 +149,29 @@ const checkReachability = async () => {
   }
   return false;
 };
+
+const cleanAliceRemenants = async () => {
+  return new Promise( (resolve, reject) => {
+    ps.lookup({command: ALICE_PROJECT_NAME}, async (err, list) => {
+      if (err) {
+        console.log(err)
+        resolve();
+        return;
+      }
+      console.log(list);
+      await Promise.all(list.map( p => {
+        return killPs(p.pid);
+      }))
+      resolve();
+    })
+  })
+}
+
+const killPs = id => {
+  return new Promise((resolve) => {
+    ps.kill(id, resolve)
+  })
+}
 
 module.exports = {
   startAlice,

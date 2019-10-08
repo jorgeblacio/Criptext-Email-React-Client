@@ -1,5 +1,4 @@
 #include "IdentityKey.h"
-#include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
 #include <iostream>
 
