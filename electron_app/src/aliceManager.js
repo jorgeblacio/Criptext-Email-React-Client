@@ -32,10 +32,17 @@ const getLogsPath = node_env => {
 const getAlicePath = nodeEnv => {
   switch (nodeEnv) {
     case 'development': {
-      return path.join(__dirname, `../../signal_interface/build/Release/${ALICE_PROJECT_NAME}`);
+      return path.join(
+        __dirname,
+        `../../signal_interface/build/Release/${ALICE_PROJECT_NAME}`
+      );
     }
     default: {
-      return path.join(path.dirname(__dirname), '../extraResources', ALICE_PROJECT_NAME);
+      return path.join(
+        path.dirname(__dirname),
+        '../extraResources',
+        ALICE_PROJECT_NAME
+      );
     }
   }
 };
@@ -150,28 +157,30 @@ const checkReachability = async () => {
   return false;
 };
 
-const cleanAliceRemenants = async () => {
-  return new Promise( (resolve, reject) => {
-    ps.lookup({command: ALICE_PROJECT_NAME}, async (err, list) => {
+const cleanAliceRemenants = () => {
+  return new Promise(resolve => {
+    ps.lookup({ command: ALICE_PROJECT_NAME }, async (err, list) => {
       if (err) {
-        console.log(err)
+        console.log(err);
         resolve();
         return;
       }
       console.log(list);
-      await Promise.all(list.map( p => {
-        return killPs(p.pid);
-      }))
+      await Promise.all(
+        list.map(p => {
+          return killPs(p.pid);
+        })
+      );
       resolve();
-    })
-  })
-}
+    });
+  });
+};
 
 const killPs = id => {
-  return new Promise((resolve) => {
-    ps.kill(id, resolve)
-  })
-}
+  return new Promise(resolve => {
+    ps.kill(id, resolve);
+  });
+};
 
 module.exports = {
   startAlice,
