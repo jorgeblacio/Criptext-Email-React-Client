@@ -101,6 +101,11 @@ const createAcountAndGetKeyBundle = async ({
   name,
   deviceType
 }) => {
+  const [currentAccount] = await getAccount();
+  if (currentAccount && currentAccount.recipientId !== recipientId) {
+    await cleanDatabase(currentAccount.recipientId);
+    await createTables();
+  }
   const accountRes = await aliceRequestWrapper(() => {
     return createAccountCredentials({
       recipientId,
@@ -171,6 +176,11 @@ const createAccountWithNewDevice = async ({
 };
 
 const uploadKeys = async ({ recipientId, name, deviceType, deviceId }) => {
+  const [currentAccount] = await getAccount();
+  if (currentAccount && currentAccount.recipientId !== recipientId) {
+    await cleanDatabase(currentAccount.recipientId);
+    await createTables();
+  }
   const keybundle = await createAcountAndGetKeyBundle({
     recipientId,
     deviceId,
