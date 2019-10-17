@@ -1,4 +1,4 @@
-import { getAlicePort } from './electronInterface';
+import { getAlicePort, getAlicePassword } from './electronInterface';
 import { generateKeyAndIv, base64ToWordArray, AesEncrypt } from './AESUtils';
 
 const aliceUrl = 'http://localhost';
@@ -23,7 +23,7 @@ export const encryptEmail = async ({
   preview,
   fileKeys
 }) => {
-  const { salt, iv, key } = generateKeyAndIv('12345678');
+  const { salt, iv, key } = generateKeyAndIv(getAlicePassword());
   const plainContent = JSON.stringify({
     accountRecipientId,
     deviceId,

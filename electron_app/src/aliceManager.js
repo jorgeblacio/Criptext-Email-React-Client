@@ -47,7 +47,19 @@ const getAlicePath = nodeEnv => {
   }
 };
 
+const generatePassword = length => {
+  var result = '';
+  var characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 let port = 8085;
+const password = generatePassword(20);
 let alice = null;
 let aliceStartTimeout = null;
 
@@ -55,7 +67,12 @@ const getPort = () => {
   return port;
 };
 
+const getPassword = () => {
+  return password;
+};
+
 const startAlice = async () => {
+  console.log(password);
   aliceStartTimeout = null;
   if (!alice) {
     const myPort = await portscanner.findAPortNotInUse(8085);
@@ -65,7 +82,7 @@ const startAlice = async () => {
     const dbpath = path.resolve(dbManager.databasePath);
     const logspath = path.resolve(getLogsPath(process.env.NODE_ENV));
     await cleanAliceRemenants();
-    alice = spawn(alicePath, [dbpath, myPort, logspath, '12345678']);
+    alice = spawn(alicePath, [dbpath, myPort, logspath, password]);
     alice.stdout.on('data', data => {
       console.log(`-----alice-----\n${data}\n -----end-----`);
     });
@@ -186,6 +203,7 @@ module.exports = {
   startAlice,
   restartAlice,
   closeAlice,
+  getPassword,
   getPort,
   checkReachability,
   isReachable

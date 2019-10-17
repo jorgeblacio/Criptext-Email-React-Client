@@ -105,7 +105,7 @@ int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath, cha
   const uint8_t *mySalt =  base64_decode(reinterpret_cast<unsigned char *>(salt->valuestring), strlen(salt->valuestring), &saltLen);
   size_t ivLen = 0;
   const uint8_t *myIv =  base64_decode(reinterpret_cast<unsigned char *>(iv->valuestring), strlen(iv->valuestring), &ivLen);
-  int result = deriveKey(&myKey, mySalt, saltLen, password, 8);
+  int result = deriveKey(&myKey, mySalt, saltLen, password, strlen(password));
   size_t decodeLen = 0;
   const uint8_t *decodedRequest =  base64_decode(reinterpret_cast<unsigned char *>(content->valuestring), strlen(content->valuestring), &decodeLen);
   

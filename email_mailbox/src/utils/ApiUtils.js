@@ -1,7 +1,7 @@
 /* global process */
 import { getOS } from './OSUtils';
 import { getOsAndArch } from './ipc';
-import { myAccount, getAlicePort } from './electronInterface';
+import { myAccount, getAlicePort, getAlicePassword } from './electronInterface';
 import { version as appVersion } from './../../package.json';
 import {
   generateKeyAndIv,
@@ -93,7 +93,7 @@ export const fetchDecryptBody = async ({
   headersMessageType,
   fileKeys
 }) => {
-  const { salt, iv, key } = generateKeyAndIv('12345678');
+  const { salt, iv, key } = generateKeyAndIv(getAlicePassword());
   const requestUrl = `${aliceUrl}:${getAlicePort()}/decrypt`;
   const options = {
     method: 'POST',
