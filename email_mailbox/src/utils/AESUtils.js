@@ -15,8 +15,8 @@ export const AesDecrypt = (encryptedDataB64, keyArray, ivArray) => {
 };
 
 export const resultString = value => {
-    return value.toString(CryptoJS.enc.Utf8);
-}
+  return value.toString(CryptoJS.enc.Utf8);
+};
 
 /*   Key
 ---------------------*/

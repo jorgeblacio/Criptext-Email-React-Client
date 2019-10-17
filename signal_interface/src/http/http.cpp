@@ -21,7 +21,7 @@ int encryptKey(struct mg_connection *conn, void *cbdata){
 }
 
 int encryptEmail(struct mg_connection *conn, void *cbdata){
-  return postEncryptEmail(conn, cbdata, db_path);
+  return postEncryptEmail(conn, cbdata, db_path, password);
 }
 
 int sessionCreate(struct mg_connection *conn, void *cbdata){

@@ -70,7 +70,7 @@ int postEncryptKey(struct mg_connection *conn, void *cbdata, char *dbPath) {
   return 200;
 }
 
-int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
+int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath, char *password) {
   int endpointId = rand() % 1000000;
   int corsResult = cors(conn);
   if (corsResult < 0) {
@@ -86,15 +86,36 @@ int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
     mg_send_http_error(conn, 400, "%s", "Request data too big");
     return 400;
   }
+
+  cJSON *requestObj = cJSON_Parse(bufferData.c_str());
   
-  cJSON *obj = cJSON_Parse(bufferData.c_str());
-  
-  if (obj == NULL) {
+  if (requestObj == NULL) {
     spdlog::error("[{0}] Not a json object: {1}", endpointId, bufferData);
     mg_send_http_error(conn, 400, "%s", "Not a json object");
     return 400;
   }
 
+  cJSON *salt, *iv, *content;
+  salt = cJSON_GetObjectItemCaseSensitive(requestObj, "salt");
+  iv = cJSON_GetObjectItemCaseSensitive(requestObj, "iv");
+  content = cJSON_GetObjectItemCaseSensitive(requestObj, "content");
+
+  signal_buffer *myKey = 0;
+  size_t saltLen = 0;
+  const uint8_t *mySalt =  base64_decode(reinterpret_cast<unsigned char *>(salt->valuestring), strlen(salt->valuestring), &saltLen);
+  size_t ivLen = 0;
+  const uint8_t *myIv =  base64_decode(reinterpret_cast<unsigned char *>(iv->valuestring), strlen(iv->valuestring), &ivLen);
+  int result = deriveKey(&myKey, mySalt, saltLen, password, 8);
+  size_t decodeLen = 0;
+  const uint8_t *decodedRequest =  base64_decode(reinterpret_cast<unsigned char *>(content->valuestring), strlen(content->valuestring), &decodeLen);
+  
+  signal_buffer *decryptedResponse = 0;
+  result = decrypt(&decryptedResponse, 2, myKey->data, myKey->len, myIv, ivLen, decodedRequest, decodeLen, 0);
+
+
+  signal_buffer_free(myKey);
+
+  cJSON *obj = cJSON_Parse(reinterpret_cast<char *>(decryptedResponse->data));
   cJSON *accountRecipientId, *deviceId, *recipientId, *body, *preview, *fileKeys;
   accountRecipientId = cJSON_GetObjectItemCaseSensitive(obj, "accountRecipientId");
   deviceId = cJSON_GetObjectItemCaseSensitive(obj, "deviceId");

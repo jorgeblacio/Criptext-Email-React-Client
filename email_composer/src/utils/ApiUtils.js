@@ -1,4 +1,6 @@
 import { getAlicePort } from './electronInterface';
+import { generateKeyAndIv, base64ToWordArray, AesEncrypt } from './AESUtils';
+
 const aliceUrl = 'http://localhost';
 
 export const createSession = async ({ accountRecipientId, keybundles }) => {
@@ -21,16 +23,27 @@ export const encryptEmail = async ({
   preview,
   fileKeys
 }) => {
+  const { salt, iv, key } = generateKeyAndIv('12345678');
+  const plainContent = JSON.stringify({
+    accountRecipientId,
+    deviceId,
+    recipientId,
+    body,
+    preview,
+    fileKeys
+  });
+  const content = await AesEncrypt(
+    plainContent,
+    base64ToWordArray(key),
+    base64ToWordArray(iv)
+  );
   const requestUrl = `${aliceUrl}:${getAlicePort()}/encrypt/email`;
   const options = {
     method: 'POST',
     body: JSON.stringify({
-      accountRecipientId,
-      deviceId,
-      recipientId,
-      body,
-      preview,
-      fileKeys
+      salt,
+      iv,
+      content
     })
   };
   return await fetch(requestUrl, options);

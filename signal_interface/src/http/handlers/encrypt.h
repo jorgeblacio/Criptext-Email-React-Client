@@ -8,4 +8,4 @@
 #include "spdlog/spdlog.h"
 
 int postEncryptKey(struct mg_connection *conn, void *cbdata, char *dbPath);
-int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath);
+int postEncryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath, char *password);

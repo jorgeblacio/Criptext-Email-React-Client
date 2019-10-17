@@ -3,7 +3,12 @@ import { getOS } from './OSUtils';
 import { getOsAndArch } from './ipc';
 import { myAccount, getAlicePort } from './electronInterface';
 import { version as appVersion } from './../../package.json';
-import { generateKeyAndIv, AesDecrypt, base64ToWordArray, resultString } from './AESUtils';
+import {
+  generateKeyAndIv,
+  AesDecrypt,
+  base64ToWordArray,
+  resultString
+} from './AESUtils';
 
 const API_CLIENT_VERSION = '8.0.0';
 const apiBaseUrl =
@@ -112,8 +117,11 @@ export const fetchDecryptBody = async ({
   }
 
   const text = await response.text();
-  const result = await AesDecrypt(text, base64ToWordArray(key), base64ToWordArray(iv));
-  console.log(resultString(result));
+  const result = await AesDecrypt(
+    text,
+    base64ToWordArray(key),
+    base64ToWordArray(iv)
+  );
   return {
     ...JSON.parse(resultString(result)),
     status: 200
