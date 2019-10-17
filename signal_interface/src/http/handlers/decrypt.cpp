@@ -1,6 +1,6 @@
 #include "decrypt.h"
 
-int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
+int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath, char *password) {
   int endpointId = rand() % 1000000;
 
   int corsResult = cors(conn);
@@ -28,7 +28,10 @@ int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
 
   std::cout << cJSON_Print(obj) << std::endl;
 
-  cJSON *emailKey, *senderId, *deviceId, *type, *recipientId, *body, *headers, *fileKeys, *headersType;
+  cJSON *salt, *iv, *emailKey, *senderId, *deviceId, *type, *recipientId, *body, *headers, *fileKeys, *headersType;
+  salt = cJSON_GetObjectItemCaseSensitive(obj, "salt");
+  iv = cJSON_GetObjectItemCaseSensitive(obj, "iv");
+
   senderId = cJSON_GetObjectItemCaseSensitive(obj, "senderId");
   deviceId = cJSON_GetObjectItemCaseSensitive(obj, "deviceId");
   recipientId = cJSON_GetObjectItemCaseSensitive(obj, "recipientId");
@@ -97,9 +100,33 @@ int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath) {
 
     cJSON_AddItemToObject(response, "decryptedFileKeys", myFileKeys);
   }
+  
+  if (!cJSON_IsString(salt) || !cJSON_IsString(iv)) {
+    spdlog::info("[{0}] Successful response", endpointId);
+    return SendJSON(conn, response);
+  }
+  
+  char *myResponse = cJSON_PrintUnformatted(response);
+  signal_buffer *myKey = 0;
+  size_t saltLen = 0;
+  const uint8_t *mySalt =  base64_decode(reinterpret_cast<unsigned char *>(salt->valuestring), strlen(salt->valuestring), &saltLen);
+  size_t ivLen = 0;
+  const uint8_t *myIv =  base64_decode(reinterpret_cast<unsigned char *>(iv->valuestring), strlen(iv->valuestring), &ivLen);
+  int result = deriveKey(&myKey, mySalt, saltLen, password, 8);
 
+  signal_buffer *encryptedResponse = 0;
+  result = encrypth(&encryptedResponse, 2, myKey->data, myKey->len, myIv, ivLen, reinterpret_cast<uint8_t *>(myResponse), strlen(myResponse), 0);
+
+  size_t encodedLen = 0;
+  unsigned char *encodedResponse = base64_encode(reinterpret_cast<unsigned char *>(signal_buffer_data(encryptedResponse)), signal_buffer_len(encryptedResponse), &encodedLen);
+
+  signal_buffer_free(myKey);
+
+  mg_send_http_ok( conn, "plain/text", encodedLen);
+  mg_write(conn, encodedResponse, encodedLen);
   spdlog::info("[{0}] Successful response", endpointId);
-  return SendJSON(conn, response);
+  return 200;
+  
 }
 
 int postDecryptKey(struct mg_connection *conn, void *cbdata, char *dbPath) {

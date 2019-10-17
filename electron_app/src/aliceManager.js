@@ -65,7 +65,7 @@ const startAlice = async () => {
     const dbpath = path.resolve(dbManager.databasePath);
     const logspath = path.resolve(getLogsPath(process.env.NODE_ENV));
     await cleanAliceRemenants();
-    alice = spawn(alicePath, [dbpath, myPort, logspath]);
+    alice = spawn(alicePath, [dbpath, myPort, logspath, '12345678']);
     alice.stdout.on('data', data => {
       console.log(`-----alice-----\n${data}\n -----end-----`);
     });

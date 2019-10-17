@@ -62,11 +62,19 @@ int main(int argc, char const *argv[]){
 
    char *dbPath = const_cast<char *>(argv[1]);
    char *port = "8085";
+   char *password = 0;
 
    if (argc > 2) {
       char *myPort = const_cast<char *>(argv[2]);
       if (is_number(port)) {
         port = myPort;
+      }
+   }
+
+   if (argc > 4) {
+      char *myPass = const_cast<char *>(argv[4]);
+      if (is_number(port)) {
+        password = myPass;
       }
    }
 
@@ -79,7 +87,7 @@ int main(int argc, char const *argv[]){
    signal(SIGABRT, CrashSignalHandler);
    signal(SIGFPE,  CrashSignalHandler);
 
-   http_init(dbPath, port);
+   http_init(dbPath, port, password);
 
    while(1) {
       

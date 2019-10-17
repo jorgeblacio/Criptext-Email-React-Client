@@ -62,7 +62,7 @@ const decryptEmail = async ({
     decryptedBody = null,
     decryptedHeaders = null,
     decryptedFileKeys = null
-  } = await res.json();
+  } = await res;
   return {
     decryptedBody,
     decryptedHeaders,

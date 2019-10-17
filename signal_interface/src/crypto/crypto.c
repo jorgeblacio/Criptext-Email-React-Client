@@ -292,6 +292,15 @@ complete:
     return result;
 }
 
+int deriveKey(signal_buffer **output, const uint8_t *salt, size_t salt_len, const char *password, size_t password_len) {
+    char *key = (char *) malloc(sizeof(char) * 16);
+    //int result = PKCS5_PBKDF2_HMAC_SHA1(password, password_len, salt, salt_len, 10000, 16, key);
+    int result = PKCS5_PBKDF2_HMAC(password, password_len, salt, salt_len, 10000, EVP_sha256(), 16, key);
+    *output = signal_buffer_create(key, 16);
+    free(key);
+    return result;
+}
+
 int decrypt(signal_buffer **output,
         int cipher,
         const uint8_t *key, size_t key_len,

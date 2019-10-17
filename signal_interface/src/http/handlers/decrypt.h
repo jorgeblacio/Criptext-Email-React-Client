@@ -8,6 +8,7 @@
 #include <time.h>
 #include "../../crypto/signal.h"
 #include "spdlog/spdlog.h"
+#include "../../crypto/crypto.h"
 
-int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath);
+int postDecryptEmail(struct mg_connection *conn, void *cbdata, char *dbPath, char* password);
 int postDecryptKey(struct mg_connection *conn, void *cbdata, char *dbPath);

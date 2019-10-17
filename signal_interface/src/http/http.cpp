@@ -6,9 +6,10 @@ struct mg_callbacks callbacks;
 struct mg_context *ctx;
 
 char* db_path;
+char* password;
 
 int decryptEmail(struct mg_connection *conn, void *cbdata){
-  return postDecryptEmail(conn, cbdata, db_path);
+  return postDecryptEmail(conn, cbdata, db_path, password);
 }
 
 int decryptKey(struct mg_connection *conn, void *cbdata){
@@ -45,8 +46,9 @@ int pong(struct mg_connection *conn, void *cbdata){
   return 1;
 }
 
-void http_init(char *dbPath, char *port){
+void http_init(char *dbPath, char *port, char* pass){
   db_path = dbPath;
+  password = pass;
 
   const char* civet_options[] = {
     "document_root",

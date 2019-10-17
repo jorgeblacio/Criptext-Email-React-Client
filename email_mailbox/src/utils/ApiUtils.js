@@ -3,6 +3,7 @@ import { getOS } from './OSUtils';
 import { getOsAndArch } from './ipc';
 import { myAccount, getAlicePort } from './electronInterface';
 import { version as appVersion } from './../../package.json';
+import { generateKeyAndIv, AesDecrypt, base64ToWordArray, resultString } from './AESUtils';
 
 const API_CLIENT_VERSION = '8.0.0';
 const apiBaseUrl =
@@ -87,10 +88,13 @@ export const fetchDecryptBody = async ({
   headersMessageType,
   fileKeys
 }) => {
+  const { salt, iv, key } = generateKeyAndIv('12345678');
   const requestUrl = `${aliceUrl}:${getAlicePort()}/decrypt`;
   const options = {
     method: 'POST',
     body: JSON.stringify({
+      salt,
+      iv,
       emailKey,
       senderId,
       deviceId,
@@ -102,7 +106,18 @@ export const fetchDecryptBody = async ({
       fileKeys
     })
   };
-  return await fetch(requestUrl, options);
+  const response = await fetch(requestUrl, options);
+  if (!response || response.status !== 200) {
+    return response;
+  }
+
+  const text = await response.text();
+  const result = await AesDecrypt(text, base64ToWordArray(key), base64ToWordArray(iv));
+  console.log(resultString(result));
+  return {
+    ...JSON.parse(resultString(result)),
+    status: 200
+  };
 };
 
 export const fetchDecryptKey = async ({

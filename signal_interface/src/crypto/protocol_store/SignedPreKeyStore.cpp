@@ -7,8 +7,10 @@
 
 int signed_pre_key_store_load_signed_pre_key(signal_buffer **record, uint32_t signed_pre_key_id, void *user_data)
 {
+    
     CriptextDB::Account *account = (CriptextDB::Account*)user_data;
     string dbPath(account->dbPath);
+
     CriptextDB::SignedPreKey signedPreKey;
     try {
         signedPreKey = CriptextDB::getSignedPreKey(dbPath, signed_pre_key_id);

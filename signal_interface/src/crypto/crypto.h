@@ -29,5 +29,8 @@ int decrypt(signal_buffer **output,
         const uint8_t *iv, size_t iv_len,
         const uint8_t *ciphertext, size_t ciphertext_len,
         void *user_data);
+int deriveKey(signal_buffer **output,
+    const uint8_t *salt, size_t salt_len,
+    const char *password, size_t password_len);
         
 #endif /* CRYPTO_H */
