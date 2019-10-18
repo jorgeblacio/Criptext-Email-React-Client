@@ -47,19 +47,22 @@ const getAlicePath = nodeEnv => {
   }
 };
 
-const generatePassword = length => {
-  var result = '';
-  var characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
+const generatePassword = () => {
+  return (
+    Math.random()
+      .toString(36)
+      .slice(-8) +
+    Math.random()
+      .toString(36)
+      .slice(-8) +
+    Math.random()
+      .toString(36)
+      .slice(-8)
+  );
 };
 
 let port = 8085;
-const password = generatePassword(20);
+const password = generatePassword();
 let alice = null;
 let aliceStartTimeout = null;
 
@@ -72,7 +75,6 @@ const getPassword = () => {
 };
 
 const startAlice = async () => {
-  console.log(password);
   aliceStartTimeout = null;
   if (!alice) {
     const myPort = await portscanner.findAPortNotInUse(8085);
