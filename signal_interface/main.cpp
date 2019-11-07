@@ -90,7 +90,7 @@ int main(int argc, char const *argv[]){
    http_init(dbPath, port, password);
 
    while(1) {
-      
+      sleep(1);
    }
 
    http_shutdown();
